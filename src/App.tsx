@@ -63,7 +63,9 @@ import {
   MapPin,
   Phone,
   Calendar,
-  ChevronRight
+  ChevronRight,
+  Image as ImageIcon,
+  Link as LinkIcon
 } from 'lucide-react';
 
 // Static assets bundled for guaranteed production and hosting availability
@@ -442,9 +444,10 @@ export default function App() {
     originalPrice: 69.99,
     stock: 25,
     description: '',
-    image: FLORAL_MAXI_IMG,
+    image: '',
     isNew: true,
   });
+  const [imagePreviewError, setImagePreviewError] = useState(false);
 
   // E-commerce state
   const [cart, setCart] = useState<CartItem[]>([
@@ -558,6 +561,9 @@ export default function App() {
     e.preventDefault();
     if (!newProductForm.name || !newProductForm.price) return;
 
+    const trimmedUrl = newProductForm.image.trim();
+    const finalImage = trimmedUrl || FLORAL_MAXI_IMG;
+
     if (editingProductId) {
       setProducts(prev => prev.map(p => {
         if (p.id === editingProductId) {
@@ -570,7 +576,7 @@ export default function App() {
             originalPrice: Number(newProductForm.originalPrice),
             stock: Number(newProductForm.stock),
             description: newProductForm.description || p.description,
-            image: newProductForm.image || p.image,
+            image: finalImage,
             isNew: newProductForm.isNew,
           };
         }
@@ -589,7 +595,7 @@ export default function App() {
         originalPrice: Number(newProductForm.originalPrice) || undefined,
         stock: Number(newProductForm.stock) || 30,
         description: newProductForm.description || 'Artisan crafted Comfort silhouette designed for effortless elegance.',
-        image: newProductForm.image || FLORAL_MAXI_IMG,
+        image: finalImage,
         rating: 5.0,
         reviews: 1,
         isNew: newProductForm.isNew,
@@ -608,9 +614,10 @@ export default function App() {
       originalPrice: 69.99,
       stock: 25,
       description: '',
-      image: FLORAL_MAXI_IMG,
+      image: '',
       isNew: true,
     });
+    setImagePreviewError(false);
     setShowAddProductModal(false);
   };
 
@@ -2348,6 +2355,7 @@ export default function App() {
                       <button 
                         onClick={() => {
                           setEditingProductId(null);
+                          setImagePreviewError(false);
                           setNewProductForm({
                             name: '',
                             category: 'Dresses',
@@ -2356,7 +2364,7 @@ export default function App() {
                             originalPrice: 69.99,
                             stock: 30,
                             description: '',
-                            image: FLORAL_MAXI_IMG,
+                            image: '',
                             isNew: true,
                           });
                           setShowAddProductModal(true);
@@ -2630,6 +2638,7 @@ export default function App() {
                         <button 
                           onClick={() => {
                             setEditingProductId(null);
+                            setImagePreviewError(false);
                             setNewProductForm({
                               name: '',
                               category: 'Dresses',
@@ -2638,7 +2647,7 @@ export default function App() {
                               originalPrice: 69.99,
                               stock: 30,
                               description: '',
-                              image: FLORAL_MAXI_IMG,
+                              image: '',
                               isNew: true,
                             });
                             setShowAddProductModal(true);
@@ -2780,6 +2789,7 @@ export default function App() {
                                         <button 
                                           onClick={() => {
                                             setEditingProductId(prod.id);
+                                            setImagePreviewError(false);
                                             setNewProductForm({
                                               name: prod.name,
                                               category: prod.category,
@@ -3475,13 +3485,20 @@ export default function App() {
 
       {/* ADD / EDIT PRODUCT MODAL (INSIDE ADMIN) */}
       {showAddProductModal && (
-        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-[#FFEAD3] shadow-2xl animate-in zoom-in-95">
+        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-[#FFEAD3] shadow-2xl animate-in zoom-in-95 my-8 max-h-[92vh] overflow-y-auto">
             <div className="flex justify-between items-center pb-3 border-b border-[#FFEAD3] mb-5">
-              <h3 className="font-serif text-xl font-bold text-[#9E3B3B]">
-                {editingProductId ? 'Edit Boutique Outfit' : 'Add New Boutique Outfit'}
-              </h3>
-              <button onClick={() => setShowAddProductModal(false)} className="p-1 rounded-full hover:bg-[#FFEAD3]">
+              <div>
+                <h3 className="font-serif text-xl font-bold text-[#9E3B3B]">
+                  {editingProductId ? 'Edit Boutique Outfit' : 'Add New Boutique Outfit'}
+                </h3>
+                <p className="text-[11px] text-gray-500">Provide outfit specifications and high-resolution photo URL.</p>
+              </div>
+              <button 
+                onClick={() => setShowAddProductModal(false)} 
+                className="p-1.5 rounded-full hover:bg-[#FFEAD3] text-gray-500 transition cursor-pointer"
+                title="Close Modal"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -3497,6 +3514,160 @@ export default function App() {
                   placeholder="e.g. Velvet Wrap Midi Dress"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#FFEAD3] text-xs focus:ring-2 focus:ring-[#9E3B3B] outline-none"
                 />
+              </div>
+
+              {/* OUTFIT IMAGE URL & LIVE PREVIEW */}
+              <div className="bg-[#FFF8F2]/60 p-4 rounded-2xl border border-[#FFEAD3]">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-[#2B1717] flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-[#9E3B3B]" />
+                    <span>Outfit Image URL</span>
+                  </label>
+                  {newProductForm.image && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewProductForm({ ...newProductForm, image: '' });
+                        setImagePreviewError(false);
+                      }}
+                      className="text-[11px] text-[#9E3B3B] hover:underline font-semibold cursor-pointer"
+                    >
+                      Clear URL
+                    </button>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                    <LinkIcon className="w-3.5 h-3.5" />
+                  </div>
+                  <input 
+                    type="url"
+                    value={newProductForm.image}
+                    onChange={(e) => {
+                      setNewProductForm({ ...newProductForm, image: e.target.value });
+                      setImagePreviewError(false);
+                    }}
+                    placeholder="https://images.unsplash.com/... or paste image web link"
+                    className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-[#FFEAD3] bg-white text-xs focus:ring-2 focus:ring-[#9E3B3B] outline-none"
+                  />
+                </div>
+                <p className="text-[11px] text-gray-500 mt-1">
+                  Paste any public web image URL (HTTPS) or choose a boutique preset below:
+                </p>
+
+                {/* Quick Presets */}
+                <div className="mt-2.5 flex flex-wrap gap-1.5 items-center">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mr-0.5">Presets:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewProductForm({ ...newProductForm, image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80' });
+                      setImagePreviewError(false);
+                    }}
+                    className="px-2 py-0.5 rounded-lg bg-white border border-[#FFEAD3] text-[10px] text-[#9E3B3B] hover:bg-[#FFEAD3] transition font-semibold cursor-pointer"
+                  >
+                    Urban Chic
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewProductForm({ ...newProductForm, image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80' });
+                      setImagePreviewError(false);
+                    }}
+                    className="px-2 py-0.5 rounded-lg bg-white border border-[#FFEAD3] text-[10px] text-[#9E3B3B] hover:bg-[#FFEAD3] transition font-semibold cursor-pointer"
+                  >
+                    Linen Resort
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewProductForm({ ...newProductForm, image: FLORAL_MAXI_IMG });
+                      setImagePreviewError(false);
+                    }}
+                    className="px-2 py-0.5 rounded-lg bg-white border border-[#FFEAD3] text-[10px] text-[#9E3B3B] hover:bg-[#FFEAD3] transition font-semibold cursor-pointer"
+                  >
+                    Floral Maxi
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewProductForm({ ...newProductForm, image: COORD_SET_IMG });
+                      setImagePreviewError(false);
+                    }}
+                    className="px-2 py-0.5 rounded-lg bg-white border border-[#FFEAD3] text-[10px] text-[#9E3B3B] hover:bg-[#FFEAD3] transition font-semibold cursor-pointer"
+                  >
+                    Co-ord Set
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewProductForm({ ...newProductForm, image: EMBROIDERED_KURTA_IMG });
+                      setImagePreviewError(false);
+                    }}
+                    className="px-2 py-0.5 rounded-lg bg-white border border-[#FFEAD3] text-[10px] text-[#9E3B3B] hover:bg-[#FFEAD3] transition font-semibold cursor-pointer"
+                  >
+                    Silk Kurta
+                  </button>
+                </div>
+
+                {/* Real-time Image Preview Box */}
+                <div className="mt-3 p-2.5 rounded-xl bg-white border border-[#FFEAD3] shadow-2xs">
+                  {newProductForm.image ? (
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-16 h-20 rounded-lg overflow-hidden bg-gray-100 border border-[#FFEAD3] shrink-0 shadow-xs">
+                        <img 
+                          src={newProductForm.image} 
+                          alt="Outfit preview" 
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                          onError={() => setImagePreviewError(true)}
+                          onLoad={() => setImagePreviewError(false)}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1 text-xs font-semibold">
+                          {imagePreviewError ? (
+                            <>
+                              <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                              <span className="text-amber-700">Preview Load Warning</span>
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                              <span className="text-emerald-700">Valid Image Source</span>
+                            </>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-gray-500 truncate mt-0.5" title={newProductForm.image}>
+                          {newProductForm.image}
+                        </p>
+                        {imagePreviewError ? (
+                          <p className="text-[10px] text-amber-600 mt-1">
+                            Link might be blocked or private. If blank, default luxury photography will be used.
+                          </p>
+                        ) : (
+                          <p className="text-[10px] text-gray-400 mt-0.5">
+                            Ready to display across storefront, product grids, and checkout.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3 text-gray-400 py-1">
+                      <div className="w-16 h-18 rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center bg-gray-50 shrink-0">
+                        <ImageIcon className="w-5 h-5 text-gray-300 mb-0.5" />
+                        <span className="text-[9px] text-gray-400">Preview</span>
+                      </div>
+                      <div>
+                        <span className="text-xs font-semibold text-gray-600 block">No Custom Image URL</span>
+                        <p className="text-[11px] text-gray-400 mt-0.5">
+                          Paste a photo link above or select a preset. If left empty, our default luxury silhouette image is assigned automatically.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -3527,7 +3698,7 @@ export default function App() {
                     required
                     value={newProductForm.price}
                     onChange={(e) => setNewProductForm({ ...newProductForm, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#FFEAD3] text-xs focus:ring-2 focus:ring-[#9E3B3B] outline-none"
+                    className="w-full px-3.5 py-2 rounded-xl border border-[#FFEAD3] text-xs focus:ring-2 focus:ring-[#9E3B3B] outline-none"
                   />
                 </div>
               </div>
@@ -3540,7 +3711,7 @@ export default function App() {
                     required
                     value={newProductForm.stock}
                     onChange={(e) => setNewProductForm({ ...newProductForm, stock: parseInt(e.target.value, 10) || 0 })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#FFEAD3] text-xs focus:ring-2 focus:ring-[#9E3B3B] outline-none"
+                    className="w-full px-3.5 py-2 rounded-xl border border-[#FFEAD3] text-xs focus:ring-2 focus:ring-[#9E3B3B] outline-none"
                   />
                 </div>
                 <div className="flex items-center pt-5">
@@ -3559,7 +3730,7 @@ export default function App() {
               <div>
                 <label className="block text-xs font-semibold text-[#2B1717] mb-1">Fabric & Silhouette Description</label>
                 <textarea 
-                  rows={3}
+                  rows={2}
                   value={newProductForm.description}
                   onChange={(e) => setNewProductForm({ ...newProductForm, description: e.target.value })}
                   placeholder="Buttery soft woven modal blend with elegant drape..."
