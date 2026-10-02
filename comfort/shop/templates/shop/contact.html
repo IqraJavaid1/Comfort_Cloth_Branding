@@ -1,0 +1,39 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Contact Styling Concierge — Comfort{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 4rem; padding-bottom: 6rem;">
+  <div style="max-width: 650px; margin: 0 auto; text-align: center; margin-bottom: 3.5rem;">
+    <p style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; color: var(--coral); text-transform: uppercase;">Concierge Service</p>
+    <h1 style="font-size: 2.75rem; color: var(--burgundy); margin-bottom: 0.75rem;">We’re Here For You</h1>
+    <p style="color: #7A5858;">Have a question about fabric weights, sizing consultations, or an existing order? Our stylists are thrilled to assist.</p>
+  </div>
+
+  <div style="max-width: 680px; margin: 0 auto; background: #fff; padding: 2.5rem 3rem; border-radius: var(--radius-lg); border: 1px solid var(--cream); box-shadow: var(--shadow-sm);">
+    <form method="POST">
+      {% csrf_token %}
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--dark-text); margin-bottom: 0.4rem;">Full Name</label>
+        {{ form.name }}
+      </div>
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--dark-text); margin-bottom: 0.4rem;">Email Address</label>
+        {{ form.email }}
+      </div>
+      <div style="margin-bottom: 1.25rem;">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--dark-text); margin-bottom: 0.4rem;">Subject / Order Reference</label>
+        {{ form.subject }}
+      </div>
+      <div style="margin-bottom: 1.75rem;">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--dark-text); margin-bottom: 0.4rem;">How Can We Assist?</label>
+        {{ form.message }}
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">
+        Send Message to Stylist
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Comfort — Outfits For Every You{% endblock %}</title>
+  <meta name="description" content="Discover timeless styles, premium fabrics, and outfits designed to make you feel confident, comfortable, and uniquely you at Comfort.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="{% static 'shop/css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="container announcement-wrapper">
+      <div class="announcement-text">
+        <i class="fa-solid fa-truck-fast"></i>
+        <span>Free Shipping on Orders Above $50</span>
+      </div>
+      <div class="announcement-links">
+        <a href="{% url 'shop:contact' %}">Help</a>
+        <span>|</span>
+        <a href="#">Track Order</a>
+        <span>|</span>
+        <span>USD ▼</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="site-header">
+    <div class="container nav-wrapper">
+      <!-- Left: Logo -->
+      <a href="{% url 'shop:home' %}" class="brand-logo" aria-label="Comfort Home">
+        <img src="{% static 'shop/images/logo.png' %}" alt="Comfort - Outfits For Every You" style="height: 68px; width: auto; object-fit: contain;">
+      </a>
+
+      <!-- Center: Navigation Links -->
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="{% url 'shop:home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+          <li><a href="{% url 'shop:shop' %}" class="nav-link {% if request.resolver_match.url_name == 'shop' %}active{% endif %}">Shop</a></li>
+          <li><a href="{% url 'shop:shop' %}?sort=newest" class="nav-link">New Arrivals</a></li>
+          <li><a href="{% url 'shop:categories' %}" class="nav-link {% if request.resolver_match.url_name == 'categories' %}active{% endif %}">Collections</a></li>
+          <li><a href="{% url 'shop:about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About Us</a></li>
+          <li><a href="{% url 'shop:contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Right: Action Icons -->
+      <div class="nav-actions">
+        <a href="{% url 'shop:shop' %}" class="action-btn" aria-label="Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </a>
+        <a href="/admin/" class="action-btn" aria-label="Account / Admin">
+          <i class="fa-regular fa-user"></i>
+        </a>
+        <a href="{% url 'shop:wishlist' %}" class="action-btn" aria-label="Wishlist">
+          <i class="fa-regular fa-heart"></i>
+          {% if wishlist_count > 0 %}
+            <span class="badge-count wishlist-badge">{{ wishlist_count }}</span>
+          {% endif %}
+        </a>
+        <a href="{% url 'shop:cart' %}" class="action-btn" aria-label="Shopping Bag">
+          <i class="fa-solid fa-bag-shopping"></i>
+          {% if cart_count > 0 %}
+            <span class="badge-count">{{ cart_count }}</span>
+          {% endif %}
+        </a>
+        <button class="action-btn menu-toggle" aria-label="Toggle Navigation">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-menu-drawer" style="display: none;">
+    <ul style="padding: 1.5rem; list-style: none;">
+      <li style="margin-bottom: 1rem;"><a href="{% url 'shop:home' %}">Home</a></li>
+      <li style="margin-bottom: 1rem;"><a href="{% url 'shop:shop' %}">Shop All</a></li>
+      <li style="margin-bottom: 1rem;"><a href="{% url 'shop:shop' %}?sort=newest">New Arrivals</a></li>
+      <li style="margin-bottom: 1rem;"><a href="{% url 'shop:categories' %}">Collections</a></li>
+      <li style="margin-bottom: 1rem;"><a href="{% url 'shop:about' %}">About Us</a></li>
+      <li style="margin-bottom: 1rem;"><a href="{% url 'shop:contact' %}">Contact Concierge</a></li>
+    </ul>
+  </div>
+
+  <!-- Messages Alert Framework -->
+  {% if messages %}
+    <div class="container" style="margin-top: 1rem;">
+      {% for message in messages %}
+        <div style="padding: 0.85rem 1.25rem; border-radius: 8px; margin-bottom: 0.5rem; background: #FFEAD3; color: #9E3B3B; font-weight: 500; font-size: 0.9rem; border: 1px solid #EA7B7B;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Main Content Block -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div style="background: rgba(255, 255, 255, 0.95); padding: 8px 14px; border-radius: 12px; display: inline-block; margin-bottom: 0.75rem;">
+            <img src="{% static 'shop/images/logo.png' %}" alt="Comfort - Outfits For Every You" style="height: 58px; width: auto; object-fit: contain;">
+          </div>
+          <p class="tagline">OUTFITS FOR EVERY YOU</p>
+          <p class="footer-desc">Crafted with intentional silhouettes, buttery soft natural textiles, and effortless elegance tailored for modern women everywhere.</p>
+          <div class="social-icons">
+            <a href="#" class="social-link" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-link" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+            <a href="#" class="social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="#" class="social-link" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="{% url 'shop:home' %}">Home</a></li>
+            <li><a href="{% url 'shop:shop' %}">Shop All</a></li>
+            <li><a href="{% url 'shop:shop' %}?sort=newest">New Arrivals</a></li>
+            <li><a href="{% url 'shop:categories' %}">Collections</a></li>
+            <li><a href="{% url 'shop:about' %}">About Us</a></li>
+            <li><a href="{% url 'shop:contact' %}">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Customer Care</h4>
+          <ul class="footer-links">
+            <li><a href="{% url 'shop:contact' %}">Size & Fit Guide</a></li>
+            <li><a href="{% url 'shop:contact' %}">Shipping & Returns</a></li>
+            <li><a href="{% url 'shop:contact' %}">Order Tracking</a></li>
+            <li><a href="{% url 'shop:contact' %}">FAQs</a></li>
+            <li><a href="{% url 'shop:contact' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'shop:contact' %}">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Follow Us</h4>
+          <p style="font-size: 0.9rem; color: rgba(255, 234, 211, 0.8); margin-bottom: 1rem;">
+            Join our style community on Instagram <strong style="color: #FFEAD3;">@ComfortOutfits</strong> and tag #ComfortEveryYou for a chance to be featured.
+          </p>
+          <div style="font-family: var(--font-script); font-size: 1.8rem; color: #FFEAD3;">
+            Style ♥ Comfort ♥ You
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © 2025 Comfort. All rights reserved.
+        </div>
+        <div class="payment-badges">
+          <span class="payment-badge"><i class="fa-brands fa-cc-visa"></i> Visa</span>
+          <span class="payment-badge"><i class="fa-brands fa-cc-mastercard"></i> Mastercard</span>
+          <span class="payment-badge"><i class="fa-brands fa-cc-paypal"></i> PayPal</span>
+          <span class="payment-badge"><i class="fa-brands fa-cc-amex"></i> Amex</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript -->
+  <script src="{% static 'shop/js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

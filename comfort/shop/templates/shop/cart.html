@@ -1,0 +1,129 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Shopping Bag — Comfort{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 6rem;">
+  
+  <div style="border-bottom: 1px solid var(--cream); padding-bottom: 1.5rem; margin-bottom: 2.5rem;">
+    <h1 style="font-size: 2.75rem; color: var(--burgundy); font-family: var(--font-serif);">Your Shopping Bag</h1>
+    <p style="color: #7A5858; font-size: 0.95rem;">Review your selected pieces and complimentary shipping status</p>
+  </div>
+
+  <!-- Free Shipping Progress -->
+  <div style="background: #FFEAD3; padding: 1.25rem 1.75rem; border-radius: var(--radius-md); border: 1px solid var(--primary); margin-bottom: 2.5rem;">
+    {% if subtotal >= 50.0 %}
+      <p style="color: var(--burgundy); font-weight: 600; font-size: 0.95rem;">
+        <i class="fa-solid fa-truck-fast"></i> You have unlocked complimentary standard delivery!
+      </p>
+    {% else %}
+      <p style="color: var(--burgundy); font-weight: 600; font-size: 0.95rem;">
+        <i class="fa-solid fa-truck"></i> Add <strong>${{ free_shipping_difference|floatformat:2 }}</strong> more to unlock <strong>Free Shipping</strong>!
+      </p>
+    {% endif %}
+  </div>
+
+  {% if cart_items %}
+    <div style="display: grid; grid-template-columns: 1.8fr 1fr; gap: 3rem; align-items: start;">
+      
+      <!-- Items Table -->
+      <div style="background: #fff; border-radius: var(--radius-md); border: 1px solid var(--cream); overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--cream); background: var(--cream-light); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #7A5858;">
+              <th style="padding: 1rem 1.5rem;">Product</th>
+              <th style="padding: 1rem 1rem;">Size</th>
+              <th style="padding: 1rem 1rem;">Quantity</th>
+              <th style="padding: 1rem 1rem;">Price</th>
+              <th style="padding: 1rem 1.5rem; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart_items %}
+              <tr style="border-bottom: 1px solid var(--cream);">
+                <td style="padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                  <img src="{% if item.product.image %}{{ item.product.image.url }}{% elif item.product.image_url %}{{ item.product.image_url }}{% else %}{% static 'shop/images/floral-maxi.jpg' %}{% endif %}" 
+                       alt="{{ item.product.name }}" 
+                       style="width: 60px; height: 75px; object-fit: cover; border-radius: 6px;">
+                  <div>
+                    <h4 style="font-size: 0.95rem; color: var(--dark-text); font-weight: 600; margin-bottom: 0.2rem;">{{ item.product.name }}</h4>
+                    <span style="font-size: 0.8rem; color: var(--coral);">${{ item.product.price }} each</span>
+                  </div>
+                </td>
+                <td style="padding: 1rem;">
+                  <span style="font-weight: 600; font-size: 0.9rem;">{{ item.size }}</span>
+                </td>
+                <td style="padding: 1rem;">
+                  <div style="display: inline-flex; align-items: center; border: 1px solid var(--cream); border-radius: var(--radius-full); padding: 0.15rem 0.4rem;">
+                    <form action="{% url 'shop:cart_update' item.key %}" method="POST" style="margin: 0;">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="decrease">
+                      <button type="submit" style="padding: 0.2rem 0.5rem; color: var(--burgundy); font-weight: 700;">-</button>
+                    </form>
+                    <span style="padding: 0 0.5rem; font-weight: 600; font-size: 0.85rem;">{{ item.quantity }}</span>
+                    <form action="{% url 'shop:cart_update' item.key %}" method="POST" style="margin: 0;">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="increase">
+                      <button type="submit" style="padding: 0.2rem 0.5rem; color: var(--burgundy); font-weight: 700;">+</button>
+                    </form>
+                  </div>
+                </td>
+                <td style="padding: 1rem; font-weight: 700; color: var(--burgundy); font-size: 1rem;">
+                  ${{ item.total_price|floatformat:2 }}
+                </td>
+                <td style="padding: 1.25rem 1.5rem; text-align: right;">
+                  <a href="{% url 'shop:cart_remove' item.key %}" style="color: #9B8A8A; font-size: 0.9rem;" title="Remove item">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Order Summary Card -->
+      <div style="background: #fff; padding: 2rem; border-radius: var(--radius-md); border: 1px solid var(--cream); box-shadow: var(--shadow-sm);">
+        <h3 style="font-size: 1.35rem; color: var(--burgundy); margin-bottom: 1.5rem; border-bottom: 1px solid var(--cream); padding-bottom: 0.75rem;">
+          Order Summary
+        </h3>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.95rem; color: #5C3D3D;">
+          <span>Subtotal</span>
+          <span style="font-weight: 600; color: var(--dark-text);">${{ subtotal|floatformat:2 }}</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.95rem; color: #5C3D3D;">
+          <span>Standard Delivery</span>
+          <span>{% if shipping == 0 %}<strong style="color: #2E7D32;">FREE</strong>{% else %}${{ shipping|floatformat:2 }}{% endif %}</span>
+        </div>
+
+        <div style="border-top: 1.5px dashed var(--cream); padding-top: 1rem; margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700; color: var(--burgundy);">
+          <span>Total</span>
+          <span>${{ total|floatformat:2 }}</span>
+        </div>
+
+        <a href="{% url 'shop:checkout' %}" class="btn btn-primary" style="width: 100%; margin-top: 2rem; padding: 1rem 0;">
+          Proceed to Checkout <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i>
+        </a>
+
+        <div style="text-align: center; margin-top: 1.25rem;">
+          <a href="{% url 'shop:shop' %}" style="font-size: 0.85rem; color: var(--coral); text-decoration: underline;">
+            Continue Shopping
+          </a>
+        </div>
+      </div>
+
+    </div>
+  {% else %}
+    <div style="background: #fff; padding: 4rem 2rem; text-align: center; border-radius: var(--radius-md); border: 1px solid var(--cream);">
+      <i class="fa-solid fa-bag-shopping" style="font-size: 3rem; color: var(--coral); margin-bottom: 1rem;"></i>
+      <h2 style="font-size: 1.75rem; color: var(--burgundy); margin-bottom: 0.5rem;">Your shopping bag is currently empty</h2>
+      <p style="color: #7A5858; margin-bottom: 2rem;">Discover timeless dresses and co-ords designed to celebrate you.</p>
+      <a href="{% url 'shop:shop' %}" class="btn btn-primary">Start Exploring</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

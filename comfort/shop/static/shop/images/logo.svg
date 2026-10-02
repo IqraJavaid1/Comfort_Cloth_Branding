@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Hat & Typography Gradients -->
+    <linearGradient id="hatGradient" x1="0%" y1="0%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#E25454" />
+      <stop offset="45%" stop-color="#C53232" />
+      <stop offset="100%" stop-color="#8F2020" />
+    </linearGradient>
+
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D43D3D" />
+      <stop offset="40%" stop-color="#B82828" />
+      <stop offset="85%" stop-color="#7B1A1A" />
+      <stop offset="100%" stop-color="#5E1010" />
+    </linearGradient>
+
+    <linearGradient id="hairGradient" x1="0%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#871A1A" />
+      <stop offset="50%" stop-color="#B82C2C" />
+      <stop offset="100%" stop-color="#D94848" />
+    </linearGradient>
+
+    <linearGradient id="skinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0E6" />
+      <stop offset="100%" stop-color="#FCDBC9" />
+    </linearGradient>
+
+    <filter id="subtleBevel" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="1" dy="2" stdDeviation="1.5" flood-color="#4A0D0D" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- ==================== WOMAN IN HAT ILLUSTRATION ==================== -->
+  <g transform="translate(140, 25)">
+    <!-- Hair background curls -->
+    <path d="M125 150 C110 180, 100 205, 125 240 C135 210, 145 190, 138 165 Z" fill="url(#hairGradient)" opacity="0.9" />
+    <path d="M145 155 C160 190, 175 220, 205 245 C185 225, 170 195, 160 165 Z" fill="url(#hairGradient)" />
+
+    <!-- Face Profile Silhouette (Looking right) -->
+    <path d="M165 95 C175 110, 185 125, 182 135 C180 140, 175 142, 178 147 C182 153, 176 156, 173 160 C170 164, 175 168, 172 173 C168 180, 155 188, 145 195 C140 185, 140 160, 140 150 Z" fill="url(#skinGradient)" />
+    <!-- Red Lip Detail -->
+    <path d="M178 152 C181 154, 181 157, 177 158 C175 157, 175 154, 178 152 Z" fill="#C53232" />
+
+    <!-- Front Cascading Hair Strands -->
+    <path d="M135 115 C130 145, 120 175, 105 195 C125 180, 138 150, 142 120 Z" fill="url(#hairGradient)" />
+    <path d="M150 118 C145 150, 142 185, 130 215 C145 190, 155 160, 156 125 Z" fill="url(#hairGradient)" />
+    <path d="M120 135 C95 160, 85 185, 88 205 C98 185, 110 165, 130 145 Z" fill="#8F2020" />
+
+    <!-- Hat Crown -->
+    <path d="M90 92 C95 42, 135 25, 165 32 C190 38, 205 60, 202 90 Z" fill="url(#hatGradient)" filter="url(#subtleBevel)" />
+    
+    <!-- Hat Ribbon (Cream / Gold) -->
+    <path d="M90 85 C120 72, 165 72, 200 82 L202 91 C165 80, 120 80, 90 93 Z" fill="#FFE8D2" />
+    <path d="M90 85 C120 72, 165 72, 200 82 L200 84 C165 74, 120 74, 90 87 Z" fill="#FFFFFF" opacity="0.6" />
+
+    <!-- Hat Brim (Dramatic wide curve) -->
+    <path d="M52 108 C90 88, 165 70, 252 110 C220 128, 150 148, 52 108 Z" fill="url(#hatGradient)" filter="url(#subtleBevel)" />
+    <!-- Brim inner shadow / depth fold -->
+    <path d="M52 108 C110 115, 185 118, 252 110 C210 132, 130 142, 52 108 Z" fill="#751818" opacity="0.3" />
+  </g>
+
+  <!-- ==================== "Comfort" TYPOGRAPHY ==================== -->
+  <g id="comfort-text" filter="url(#subtleBevel)">
+    <!-- Letter 'C' Grand Swash and Body -->
+    <circle cx="160" cy="155" r="14" fill="url(#textGradient)" />
+    <path d="M160 155 C120 155, 65 190, 48 245 C30 298, 60 338, 110 345 C180 355, 230 335, 280 325 C250 332, 190 342, 130 336 C80 330, 58 298, 70 255 C85 205, 135 168, 175 168 C185 168, 195 172, 190 185 C185 195, 170 205, 155 210 C145 205, 150 190, 165 188 C175 186, 178 180, 175 175 C170 170, 160 170, 150 180 C135 195, 125 220, 125 245 C125 265, 135 280, 155 280 C175 280, 195 265, 205 240 C195 260, 175 275, 155 275 C140 275, 132 262, 132 245 C132 222, 145 198, 165 178 C182 162, 178 155, 160 155 Z" fill="url(#textGradient)" />
+
+    <!-- Letter 'o' -->
+    <path d="M195 272 C185 272, 178 260, 180 240 C182 220, 192 205, 205 205 C218 205, 225 218, 222 238 C220 258, 210 272, 195 272 Z M198 214 C190 214, 186 226, 185 238 C184 250, 188 262, 196 262 C204 262, 208 250, 209 238 C210 225, 206 214, 198 214 Z" fill="url(#textGradient)" />
+
+    <!-- Letter 'm' with rhythm curves -->
+    <path d="M225 270 L228 210 L238 210 C242 218, 248 225, 255 215 C262 208, 270 205, 278 215 C285 225, 288 238, 286 270 L275 270 C277 245, 275 225, 268 220 C262 215, 256 220, 254 235 L250 270 L239 270 L242 225 C242 218, 238 215, 235 220 L232 270 Z" fill="url(#textGradient)" />
+
+    <!-- Letter 'f' with grand tall loop and crossbar -->
+    <circle cx="308" cy="148" r="9" fill="url(#textGradient)" />
+    <path d="M308 148 C285 152, 272 175, 270 205 L266 220 L255 222 L254 228 L265 227 L256 315 C250 330, 238 340, 225 345 C242 342, 255 330, 262 312 L274 227 L292 226 L293 220 L276 221 L280 195 C282 175, 290 160, 305 156 Z" fill="url(#textGradient)" />
+
+    <!-- Letter 'o' (second) -->
+    <path d="M308 272 C298 272, 290 260, 292 240 C294 220, 305 205, 318 205 C330 205, 338 218, 335 238 C332 258, 322 272, 308 272 Z M311 214 C303 214, 299 226, 298 238 C297 250, 301 262, 309 262 C317 262, 321 250, 322 238 C323 225, 319 214, 311 214 Z" fill="url(#textGradient)" />
+
+    <!-- Letter 'r' -->
+    <path d="M340 270 L345 208 L355 208 C357 215, 362 218, 370 208 C378 198, 388 200, 390 210 C382 214, 375 218, 368 226 C362 235, 360 250, 358 270 Z" fill="url(#textGradient)" />
+
+    <!-- Letter 't' with wide elegant swash crossbar -->
+    <path d="M395 185 L392 208 L418 208 L418 214 L391 214 L387 252 C386 262, 389 268, 396 268 C405 268, 412 260, 418 250 L422 254 C412 268, 402 274, 390 274 C378 274, 374 262, 375 248 L380 214 L368 214 L369 208 L381 208 L384 185 Z" fill="url(#textGradient)" />
+    <path d="M418 208 C450 208, 490 208, 515 210 L515 213 C490 212, 450 212, 418 214 Z" fill="url(#textGradient)" />
+  </g>
+
+  <!-- ==================== SUBTITLE & DIVIDERS ==================== -->
+  <g transform="translate(0, 335)">
+    <!-- Left Divider Rule -->
+    <line x1="55" y1="12" x2="165" y2="12" stroke="#D43D3D" stroke-width="2.5" stroke-linecap="round" />
+    
+    <!-- Tagline Text -->
+    <text x="300" y="18" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="700" letter-spacing="7" fill="#751818" text-anchor="middle">
+      OUTFITS FOR EVERY YOU
+    </text>
+
+    <!-- Right Divider Rule -->
+    <line x1="435" y1="12" x2="545" y2="12" stroke="#D43D3D" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Small Centered Red Heart Below -->
+    <path d="M300 37 C298 33, 293 30, 289 32 C285 34, 284 38, 286 42 C288 47, 295 53, 300 57 C305 53, 312 47, 314 42 C316 38, 315 34, 311 32 C307 30, 302 33, 300 37 Z" fill="#D43D3D" />
+  </g>
+</svg>

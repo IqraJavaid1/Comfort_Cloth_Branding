@@ -1,0 +1,325 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Comfort — Outfits For Every You | Elegant Women's Fashion{% endblock %}
+
+{% block content %}
+
+<!-- HERO SECTION -->
+<section class="hero-section">
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <p class="hero-subtitle">STYLE MEETS COMFORT</p>
+      <h1 class="hero-title">Dress Like<br>Your Best Self</h1>
+      <p class="hero-description">
+        Discover timeless styles, premium fabrics and outfits designed to make you feel confident, comfortable and uniquely you.
+      </p>
+      <div>
+        <a href="{% url 'shop:shop' %}" class="btn btn-primary">
+          Shop Now <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-image-wrap">
+      <div class="hero-model-card">
+        <img src="{% static 'shop/images/hero.jpg' %}" alt="Comfort Editorial Fashion Lookbook" loading="eager">
+      </div>
+      <div class="hero-floating-script">
+        Fashion &nbsp;•&nbsp; Comfort &nbsp;•&nbsp; Confidence
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOP BY CATEGORY -->
+<section class="categories-section">
+  <div class="container">
+    <div class="section-header">
+      <p style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.15em; color: var(--coral); text-transform: uppercase; margin-bottom: 0.5rem;">Curated Silhouettes</p>
+      <h2 class="section-title">SHOP BY CATEGORY</h2>
+      <p class="section-desc">Tailored essentials for every moment of your daily life.</p>
+    </div>
+
+    <div class="category-grid">
+      <a href="{% url 'shop:shop' %}?category=dresses" class="category-item">
+        <div class="category-circle">
+          <i class="fa-solid fa-person-dress"></i>
+        </div>
+        <span class="category-name">Dresses</span>
+      </a>
+
+      <a href="{% url 'shop:shop' %}?category=tops-shirts" class="category-item">
+        <div class="category-circle">
+          <i class="fa-solid fa-shirt"></i>
+        </div>
+        <span class="category-name">Tops & Shirts</span>
+      </a>
+
+      <a href="{% url 'shop:shop' %}?category=bottoms" class="category-item">
+        <div class="category-circle">
+          <i class="fa-solid fa-vest"></i>
+        </div>
+        <span class="category-name">Bottoms</span>
+      </a>
+
+      <a href="{% url 'shop:shop' %}?category=co-ords" class="category-item">
+        <div class="category-circle">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <span class="category-name">Co-ords</span>
+      </a>
+
+      <a href="{% url 'shop:shop' %}?category=outerwear" class="category-item">
+        <div class="category-circle">
+          <i class="fa-solid fa-cloud-sun"></i>
+        </div>
+        <span class="category-name">Outerwear</span>
+      </a>
+
+      <a href="{% url 'shop:shop' %}?category=accessories" class="category-item">
+        <div class="category-circle">
+          <i class="fa-regular fa-gem"></i>
+        </div>
+        <span class="category-name">Accessories</span>
+      </a>
+
+      <a href="{% url 'shop:shop' %}?category=footwear" class="category-item">
+        <div class="category-circle">
+          <i class="fa-solid fa-shoe-prints"></i>
+        </div>
+        <span class="category-name">Footwear</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- NEW ARRIVALS -->
+<section class="products-section">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.75rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <p style="font-size: 0.8rem; font-weight: 700; letter-spacing: 0.15em; color: var(--coral); text-transform: uppercase; margin-bottom: 0.4rem;">NEW ARRIVALS</p>
+        <h2 style="font-size: 2.25rem; color: var(--burgundy); line-height: 1.15;">Fresh Styles<br>Just For You</h2>
+        <p style="color: #6E4D4D; font-size: 0.95rem; margin-top: 0.5rem;">Explore the latest trends and add a touch of elegance to your wardrobe.</p>
+      </div>
+      <div>
+        <a href="{% url 'shop:shop' %}?sort=newest" class="btn btn-outline">
+          View All <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="products-grid">
+      <!-- 1. Floral Maxi Dress -->
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <a href="{% url 'shop:shop' %}">
+            <img src="{% static 'shop/images/floral-maxi.jpg' %}" alt="Floral Maxi Dress" class="product-img">
+          </a>
+          <span class="badge-new">New</span>
+          <button class="wishlist-toggle" data-product-id="1" aria-label="Save to wishlist">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Dresses</span>
+          <h3 class="product-title"><a href="{% url 'shop:shop' %}">Floral Maxi Dress</a></h3>
+          <div class="product-rating">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <span class="count">(24)</span>
+          </div>
+          <div class="product-bottom">
+            <div>
+              <span class="product-price">$49.99</span>
+              <span class="product-original-price">$69.99</span>
+            </div>
+            <form action="{% url 'shop:cart_add' 1 %}" method="POST" style="margin: 0;">
+              {% csrf_token %}
+              <input type="hidden" name="size" value="M">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="action-btn" style="background: var(--cream); color: var(--burgundy);" title="Add to Bag">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Elegant Co-ord Set -->
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <a href="{% url 'shop:shop' %}">
+            <img src="{% static 'shop/images/coord-set.jpg' %}" alt="Elegant Co-ord Set" class="product-img">
+          </a>
+          <span class="badge-new">New</span>
+          <button class="wishlist-toggle" data-product-id="2" aria-label="Save to wishlist">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Co-ords</span>
+          <h3 class="product-title"><a href="{% url 'shop:shop' %}">Elegant Co-ord Set</a></h3>
+          <div class="product-rating">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <span class="count">(19)</span>
+          </div>
+          <div class="product-bottom">
+            <div>
+              <span class="product-price">$54.99</span>
+              <span class="product-original-price">$75.00</span>
+            </div>
+            <form action="{% url 'shop:cart_add' 2 %}" method="POST" style="margin: 0;">
+              {% csrf_token %}
+              <input type="hidden" name="size" value="S">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="action-btn" style="background: var(--cream); color: var(--burgundy);" title="Add to Bag">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Embroidered Kurta Set -->
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <a href="{% url 'shop:shop' %}">
+            <img src="{% static 'shop/images/embroidered-kurta.jpg' %}" alt="Embroidered Kurta Set" class="product-img">
+          </a>
+          <span class="badge-new">New</span>
+          <button class="wishlist-toggle" data-product-id="3" aria-label="Save to wishlist">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Ethnic & Fusion</span>
+          <h3 class="product-title"><a href="{% url 'shop:shop' %}">Embroidered Kurta Set</a></h3>
+          <div class="product-rating">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <span class="count">(32)</span>
+          </div>
+          <div class="product-bottom">
+            <div>
+              <span class="product-price">$44.99</span>
+              <span class="product-original-price">$59.99</span>
+            </div>
+            <form action="{% url 'shop:cart_add' 3 %}" method="POST" style="margin: 0;">
+              {% csrf_token %}
+              <input type="hidden" name="size" value="M">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="action-btn" style="background: var(--cream); color: var(--burgundy);" title="Add to Bag">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Chic Wide Leg Pants -->
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <a href="{% url 'shop:shop' %}">
+            <img src="{% static 'shop/images/hero.jpg' %}" alt="Chic Wide Leg Pants" class="product-img" style="object-position: center bottom;">
+          </a>
+          <span class="badge-new">New</span>
+          <button class="wishlist-toggle" data-product-id="4" aria-label="Save to wishlist">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </div>
+        <div class="product-info">
+          <span class="product-category">Bottoms</span>
+          <h3 class="product-title"><a href="{% url 'shop:shop' %}">Chic Wide Leg Pants</a></h3>
+          <div class="product-rating">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <span class="count">(18)</span>
+          </div>
+          <div class="product-bottom">
+            <div>
+              <span class="product-price">$39.99</span>
+              <span class="product-original-price">$52.00</span>
+            </div>
+            <form action="{% url 'shop:cart_add' 4 %}" method="POST" style="margin: 0;">
+              {% csrf_token %}
+              <input type="hidden" name="size" value="L">
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="action-btn" style="background: var(--cream); color: var(--burgundy);" title="Add to Bag">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT / BRAND STORY -->
+<section class="about-section">
+  <div class="container about-grid">
+    <div class="about-image-wrap">
+      <img src="{% static 'shop/images/about-story.jpg' %}" alt="Comfort Ethos and Feminine Craftsmanship">
+    </div>
+
+    <div class="about-text-content">
+      <p class="about-label">OUR STORY</p>
+      <h2 class="about-title">Comfort Is More<br>Than Just A Brand</h2>
+      <p class="about-paragraph">
+        We believe every girl deserves to feel beautiful, confident and comfortable — every single day. Our outfits are crafted with love, quality and a passion for modern femininity. From early morning meetings to sunset dinners, our silhouettes adapt to your life effortlessly.
+      </p>
+
+      <div class="about-features">
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-feather"></i></div>
+          <div class="feature-text">Premium Quality Fabrics</div>
+        </div>
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-regular fa-clock"></i></div>
+          <div class="feature-text">Trendy & Timeless Designs</div>
+        </div>
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-regular fa-heart"></i></div>
+          <div class="feature-text">Made for Every You</div>
+        </div>
+      </div>
+
+      <a href="{% url 'shop:about' %}" class="btn btn-primary">
+        Learn More <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER SECTION -->
+<section class="newsletter-section">
+  <div class="container newsletter-box">
+    <h2 class="newsletter-title">Subscribe to Our Newsletter</h2>
+    <p class="newsletter-subtitle">
+      Be the first to know about new arrivals, exclusive offers and style tips.
+    </p>
+
+    <form action="{% url 'shop:newsletter_subscribe' %}" method="POST" class="newsletter-form">
+      {% csrf_token %}
+      {{ newsletter_form.email }}
+      <button type="submit" class="newsletter-btn">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Collections & Categories — Comfort{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+  <div class="section-header" style="text-align: center; margin-bottom: 3.5rem;">
+    <p style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; color: var(--coral); text-transform: uppercase;">Curated For Her</p>
+    <h1 style="font-size: 2.75rem; color: var(--burgundy); margin-bottom: 0.75rem;">Collections & Silhouettes</h1>
+    <p style="max-width: 600px; margin: 0 auto; color: #7A5858;">Explore our intentionally designed collections crafted from breathable linens, rich silks, and premium knit blends.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem;">
+    <div style="background: #fff; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--cream); box-shadow: var(--shadow-sm); text-align: center; padding-bottom: 2rem;">
+      <div style="height: 280px; overflow: hidden; background: #FAF4EF;">
+        <img src="{% static 'shop/images/floral-maxi.jpg' %}" alt="Dresses" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <h3 style="font-size: 1.5rem; color: var(--burgundy); margin-top: 1.5rem; margin-bottom: 0.5rem;">Dresses</h3>
+      <p style="font-size: 0.9rem; color: #7A5858; padding: 0 1.5rem 1.25rem;">Flowy maxis, graceful wraps, and effortless day-to-evening dresses.</p>
+      <a href="{% url 'shop:shop' %}?category=dresses" class="btn btn-outline" style="padding: 0.5rem 1.5rem; font-size: 0.85rem;">View Dresses</a>
+    </div>
+
+    <div style="background: #fff; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--cream); box-shadow: var(--shadow-sm); text-align: center; padding-bottom: 2rem;">
+      <div style="height: 280px; overflow: hidden; background: #FAF4EF;">
+        <img src="{% static 'shop/images/coord-set.jpg' %}" alt="Co-ords" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <h3 style="font-size: 1.5rem; color: var(--burgundy); margin-top: 1.5rem; margin-bottom: 0.5rem;">Co-ord Sets</h3>
+      <p style="font-size: 0.9rem; color: #7A5858; padding: 0 1.5rem 1.25rem;">Harmonious two-piece ensembles that make morning styling completely effortless.</p>
+      <a href="{% url 'shop:shop' %}?category=co-ords" class="btn btn-outline" style="padding: 0.5rem 1.5rem; font-size: 0.85rem;">View Co-ords</a>
+    </div>
+
+    <div style="background: #fff; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--cream); box-shadow: var(--shadow-sm); text-align: center; padding-bottom: 2rem;">
+      <div style="height: 280px; overflow: hidden; background: #FAF4EF;">
+        <img src="{% static 'shop/images/embroidered-kurta.jpg' %}" alt="Artisan Fusion" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <h3 style="font-size: 1.5rem; color: var(--burgundy); margin-top: 1.5rem; margin-bottom: 0.5rem;">Ethnic & Fusion</h3>
+      <p style="font-size: 0.9rem; color: #7A5858; padding: 0 1.5rem 1.25rem;">Intricate thread embroidery, palazzo sets, and timeless heirloom craftsmanship.</p>
+      <a href="{% url 'shop:shop' %}?category=ethnic-fusion" class="btn btn-outline" style="padding: 0.5rem 1.5rem; font-size: 0.85rem;">View Fusion</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

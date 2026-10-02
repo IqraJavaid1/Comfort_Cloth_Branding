@@ -1,0 +1,27 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmed — Comfort{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 4.5rem; padding-bottom: 6rem; max-width: 650px; text-align: center;">
+  <div style="background: #fff; padding: 3.5rem 2.5rem; border-radius: var(--radius-lg); border: 1px solid var(--cream); box-shadow: var(--shadow-sm);">
+    <div style="width: 80px; height: 80px; background: #FFEAD3; color: var(--burgundy); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 2.25rem;">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    
+    <h1 style="font-size: 2.5rem; color: var(--burgundy); margin-bottom: 0.75rem;">Thank You For Your Order!</h1>
+    <p style="font-size: 1.1rem; color: #5C3D3D; margin-bottom: 1.5rem;">
+      Your order reference is <strong style="color: var(--burgundy);">#{{ order_id }}</strong>. We have sent a confirmation email with tracking details.
+    </p>
+
+    <div style="padding: 1.25rem; background: var(--cream-light); border-radius: 8px; font-size: 0.9rem; color: #7A5858; margin-bottom: 2rem;">
+      Your outfits are currently being delicately prepared and gift-wrapped at our Comfort atelier.
+    </div>
+
+    <a href="{% url 'shop:shop' %}" class="btn btn-primary">
+      Continue Exploring Comfort
+    </a>
+  </div>
+</div>
+{% endblock %}

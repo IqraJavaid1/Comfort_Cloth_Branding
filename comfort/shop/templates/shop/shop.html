@@ -1,0 +1,144 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Shop All Women's Fashion — Comfort{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+  
+  <!-- Header Bar -->
+  <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--cream); padding-bottom: 1.5rem; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1 style="font-size: 2.5rem; color: var(--burgundy); font-family: var(--font-serif);">Shop All</h1>
+      <p style="color: #7A5858; font-size: 0.95rem;">Showing {{ product_count }} thoughtfully crafted outfits</p>
+    </div>
+
+    <!-- Search & Sort Controls -->
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+      <form method="GET" action="{% url 'shop:shop' %}" style="display: flex; background: #fff; border: 1px solid var(--cream); border-radius: var(--radius-full); padding: 0.25rem 0.5rem; align-items: center;">
+        {% if current_category %}<input type="hidden" name="category" value="{{ current_category.slug }}">{% endif %}
+        <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search dresses, sets..." style="border: none; padding: 0.4rem 0.75rem; font-size: 0.85rem; outline: none;">
+        <button type="submit" style="color: var(--burgundy); padding: 0.4rem 0.75rem;"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+
+      <form method="GET" action="{% url 'shop:shop' %}">
+        {% if current_category %}<input type="hidden" name="category" value="{{ current_category.slug }}">{% endif %}
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        <select name="sort" onchange="this.form.submit()" style="padding: 0.6rem 1rem; border-radius: var(--radius-full); border: 1px solid var(--cream); background: #fff; font-size: 0.85rem; color: var(--dark-text); outline: none;">
+          <option value="featured" {% if sort_by == 'featured' %}selected{% endif %}>Sort: Featured</option>
+          <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Sort: Newest</option>
+          <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+        </select>
+      </form>
+    </div>
+  </div>
+
+  <!-- Layout Grid: Sidebar + Products -->
+  <div style="display: grid; grid-template-columns: 260px 1fr; gap: 3rem;">
+    
+    <!-- Sidebar Filters -->
+    <aside>
+      <!-- Categories -->
+      <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--cream); margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.1rem; color: var(--burgundy); margin-bottom: 1rem;">Categories</h3>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.9rem;">
+          <li>
+            <a href="{% url 'shop:shop' %}" style="color: {% if not current_category %}var(--burgundy); font-weight: 700;{% else %}var(--dark-text);{% endif %}">
+              All Collections
+            </a>
+          </li>
+          {% for cat in categories %}
+            <li>
+              <a href="{% url 'shop:shop' %}?category={{ cat.slug }}" style="color: {% if current_category.slug == cat.slug %}var(--burgundy); font-weight: 700;{% else %}var(--dark-text);{% endif %}">
+                {{ cat.name }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Sizing Filter -->
+      <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--cream); margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.1rem; color: var(--burgundy); margin-bottom: 1rem;">Filter by Size</h3>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          {% for s in "XS,S,M,L,XL"|make_list %}
+            <a href="{% url 'shop:shop' %}?size={{ s }}{% if current_category %}&category={{ current_category.slug }}{% endif %}" 
+               style="padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; border: 1px solid {% if selected_size == s %}var(--burgundy); background: var(--burgundy); color: #fff;{% else %}var(--cream); background: #fff; color: var(--dark-text);{% endif %}">
+              {{ s }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Free Delivery Promo Card -->
+      <div style="background: #FFEAD3; padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--primary); text-align: center;">
+        <i class="fa-solid fa-truck" style="font-size: 1.75rem; color: var(--burgundy); margin-bottom: 0.5rem;"></i>
+        <h4 style="font-size: 1rem; color: var(--burgundy); margin-bottom: 0.3rem;">Free Express Delivery</h4>
+        <p style="font-size: 0.8rem; color: #5C3D3D;">On all orders over $50 with complimentary boutique wrapping.</p>
+      </div>
+    </aside>
+
+    <!-- Product Grid -->
+    <div>
+      {% if products %}
+        <div class="products-grid" style="grid-template-columns: repeat(3, 1fr);">
+          {% for prod in products %}
+            <div class="product-card">
+              <div class="product-img-wrap">
+                <a href="{% url 'shop:product_detail' prod.slug %}">
+                  <img src="{% if prod.image %}{{ prod.image.url }}{% elif prod.image_url %}{{ prod.image_url }}{% else %}{% static 'shop/images/floral-maxi.jpg' %}{% endif %}" alt="{{ prod.name }}" class="product-img">
+                </a>
+                {% if prod.is_new %}
+                  <span class="badge-new">New</span>
+                {% endif %}
+                <button class="wishlist-toggle" data-product-id="{{ prod.id }}" aria-label="Save to wishlist">
+                  <i class="fa-solid fa-heart"></i>
+                </button>
+              </div>
+              <div class="product-info">
+                <span class="product-category">{{ prod.category.name }}</span>
+                <h3 class="product-title">
+                  <a href="{% url 'shop:product_detail' prod.slug %}">{{ prod.name }}</a>
+                </h3>
+                <div class="product-rating">
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <i class="fa-solid fa-star"></i>
+                  <span class="count">({{ prod.review_count }})</span>
+                </div>
+                <div class="product-bottom">
+                  <div>
+                    <span class="product-price">${{ prod.price }}</span>
+                    {% if prod.original_price %}
+                      <span class="product-original-price">${{ prod.original_price }}</span>
+                    {% endif %}
+                  </div>
+                  <form action="{% url 'shop:cart_add' prod.id %}" method="POST" style="margin: 0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="size" value="M">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="action-btn" style="background: var(--cream); color: var(--burgundy);" title="Add to Bag">
+                      <i class="fa-solid fa-plus"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="background: #fff; padding: 4rem 2rem; text-align: center; border-radius: var(--radius-md); border: 1px solid var(--cream);">
+          <i class="fa-regular fa-face-smile" style="font-size: 3rem; color: var(--coral); margin-bottom: 1rem;"></i>
+          <h2 style="font-size: 1.75rem; color: var(--burgundy); margin-bottom: 0.5rem;">No matching outfits found</h2>
+          <p style="color: #6E4D4D; margin-bottom: 1.5rem;">Try changing your filters or searching with another keyword.</p>
+          <a href="{% url 'shop:shop' %}" class="btn btn-primary">Clear Filters</a>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} — Comfort{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 5.5rem;">
+  
+  <!-- Breadcrumb -->
+  <div style="font-size: 0.85rem; color: #7A5858; margin-bottom: 2rem;">
+    <a href="{% url 'shop:home' %}">Home</a> &nbsp;/&nbsp; 
+    <a href="{% url 'shop:shop' %}">Shop</a> &nbsp;/&nbsp; 
+    <a href="{% url 'shop:shop' %}?category={{ product.category.slug }}">{{ product.category.name }}</a> &nbsp;/&nbsp; 
+    <span style="color: var(--burgundy); font-weight: 600;">{{ product.name }}</span>
+  </div>
+
+  <!-- PDP Grid -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; margin-bottom: 5rem;">
+    
+    <!-- Left: Gallery -->
+    <div>
+      <div style="border-radius: var(--radius-lg); overflow: hidden; background: #fff; box-shadow: var(--shadow-md); border: 1px solid var(--cream); aspect-ratio: 3 / 4;">
+        <img src="{% if product.image %}{{ product.image.url }}{% elif product.image_url %}{{ product.image_url }}{% else %}{% static 'shop/images/floral-maxi.jpg' %}{% endif %}" 
+             alt="{{ product.name }}" 
+             style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+    </div>
+
+    <!-- Right: Purchase Module -->
+    <div>
+      <p style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; color: var(--coral); text-transform: uppercase; margin-bottom: 0.5rem;">
+        {{ product.category.name }}
+      </p>
+      
+      <h1 style="font-size: 2.75rem; color: var(--burgundy); line-height: 1.15; margin-bottom: 0.75rem;">
+        {{ product.name }}
+      </h1>
+
+      <!-- Ratings -->
+      <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #E29548; margin-bottom: 1.25rem;">
+        <div>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <span style="color: var(--dark-text); font-weight: 600;">{{ product.rating }}</span>
+        <span style="color: #9B8A8A;">({{ product.review_count }} verified reviews)</span>
+      </div>
+
+      <!-- Price -->
+      <div style="margin-bottom: 1.75rem;">
+        <span style="font-size: 2rem; font-weight: 700; color: var(--burgundy);">${{ product.price }}</span>
+        {% if product.original_price %}
+          <span style="font-size: 1.2rem; text-decoration: line-through; color: var(--gray-400); margin-left: 0.75rem;">${{ product.original_price }}</span>
+          <span style="font-size: 0.75rem; background: #FFEAD3; color: var(--burgundy); font-weight: 700; padding: 0.25rem 0.6rem; border-radius: var(--radius-full); margin-left: 0.5rem;">Save ${(product.original_price - product.price)}</span>
+        {% endif %}
+      </div>
+
+      <!-- Description -->
+      <p style="font-size: 1rem; color: #5C3D3D; line-height: 1.7; margin-bottom: 2rem; border-top: 1px solid var(--cream); border-bottom: 1px solid var(--cream); padding: 1.5rem 0;">
+        {{ product.description }}
+      </p>
+
+      <!-- Purchase Form -->
+      <form action="{% url 'shop:cart_add' product.id %}" method="POST">
+        {% csrf_token %}
+
+        <!-- Size Selection -->
+        <div style="margin-bottom: 1.75rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.6rem; font-size: 0.9rem;">
+            <span style="font-weight: 600;">Select Size:</span>
+            <a href="{% url 'shop:contact' %}" style="color: var(--coral); font-size: 0.8rem; text-decoration: underline;">Size Guide</a>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            {% for s in "XS,S,M,L,XL"|make_list %}
+              <label style="cursor: pointer;">
+                <input type="radio" name="size" value="{{ s }}" {% if s == 'M' %}checked{% endif %} style="display: none;" class="size-radio">
+                <span class="size-pill" style="display: inline-block; padding: 0.6rem 1.25rem; border: 1.5px solid var(--cream); border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; transition: var(--transition);">
+                  {{ s }}
+                </span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Color Palette -->
+        <div style="margin-bottom: 2rem;">
+          <div style="margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600;">Color Tone:</div>
+          <p style="font-size: 0.85rem; color: #7A5858;">{{ product.color }}</p>
+        </div>
+
+        <!-- Quantity & Add to Cart -->
+        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem;">
+          <div class="quantity-selector" style="display: flex; align-items: center; border: 1.5px solid var(--cream); border-radius: var(--radius-full); background: #fff; padding: 0.25rem 0.5rem;">
+            <button type="button" class="qty-dec action-btn" style="width: 32px; height: 32px;"><i class="fa-solid fa-minus"></i></button>
+            <input type="number" name="quantity" value="1" min="1" max="10" class="qty-input" style="width: 40px; text-align: center; border: none; outline: none; font-weight: 600; color: var(--dark-text);">
+            <button type="button" class="qty-inc action-btn" style="width: 32px; height: 32px;"><i class="fa-solid fa-plus"></i></button>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="flex-grow: 1;">
+            <i class="fa-solid fa-bag-shopping" style="margin-right: 8px;"></i> Add to Cart
+          </button>
+
+          <a href="{% url 'shop:wishlist_toggle' product.id %}" class="action-btn" style="border: 1.5px solid var(--cream); width: 50px; height: 50px; border-radius: var(--radius-full);" title="Save to Wishlist">
+            <i class="fa-solid fa-heart" style="color: var(--coral); font-size: 1.2rem;"></i>
+          </a>
+        </div>
+      </form>
+
+      <!-- Trust Badges -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding: 1.5rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--cream); text-align: center; font-size: 0.8rem;">
+        <div><i class="fa-solid fa-truck" style="color: var(--coral); margin-bottom: 0.3rem;"></i><br>Free shipping over $50</div>
+        <div><i class="fa-solid fa-rotate-left" style="color: var(--coral); margin-bottom: 0.3rem;"></i><br>Easy 30-day returns</div>
+        <div><i class="fa-solid fa-shield-halved" style="color: var(--coral); margin-bottom: 0.3rem;"></i><br>100% Genuine fabrics</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Reviews Section -->
+  <div style="background: #fff; padding: 3rem; border-radius: var(--radius-lg); border: 1px solid var(--cream); margin-bottom: 5rem;">
+    <h3 style="font-size: 2rem; color: var(--burgundy); margin-bottom: 2rem;">Customer Reviews ({{ product.reviews.count|default:product.review_count }})</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+      <!-- Review List -->
+      <div>
+        {% for r in product.reviews.all %}
+          <div style="border-bottom: 1px solid var(--cream); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <strong>{{ r.name }}</strong>
+              <span style="color: #E29548;">★★★★★</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #5C3D3D;">{{ r.comment }}</p>
+          </div>
+        {% empty %}
+          <div style="border-bottom: 1px solid var(--cream); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <strong>Eleanor Vance</strong>
+              <span style="color: #E29548;">★★★★★</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #5C3D3D;">"The fabric feels so buttery and soft against my skin. The fit is flattering without clinging uncomfortably. Comfort is now my favorite boutique!"</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Add Review Form -->
+      <div style="background: var(--cream-light); padding: 2rem; border-radius: var(--radius-md);">
+        <h4 style="font-size: 1.25rem; color: var(--burgundy); margin-bottom: 1rem;">Write a Review</h4>
+        <form method="POST">
+          {% csrf_token %}
+          <div style="margin-bottom: 1rem;">
+            {{ review_form.name }}
+          </div>
+          <div style="margin-bottom: 1rem;">
+            {{ review_form.rating }}
+          </div>
+          <div style="margin-bottom: 1rem;">
+            {{ review_form.comment }}
+          </div>
+          <button type="submit" name="submit_review" class="btn btn-primary" style="width: 100%;">Post Review</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

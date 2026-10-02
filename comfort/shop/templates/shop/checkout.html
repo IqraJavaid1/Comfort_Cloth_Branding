@@ -1,0 +1,67 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}Checkout — Comfort Boutique{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 6rem; max-width: 900px;">
+  
+  <div style="border-bottom: 1px solid var(--cream); padding-bottom: 1.5rem; margin-bottom: 2.5rem; text-align: center;">
+    <h1 style="font-size: 2.75rem; color: var(--burgundy); font-family: var(--font-serif);">Boutique Checkout</h1>
+    <p style="color: #7A5858; font-size: 0.95rem;">Complete your delivery details for complimentary tracked shipping</p>
+  </div>
+
+  <div style="background: #fff; padding: 2.5rem 3rem; border-radius: var(--radius-lg); border: 1px solid var(--cream); box-shadow: var(--shadow-sm);">
+    <form method="POST">
+      {% csrf_token %}
+      
+      <h3 style="font-size: 1.35rem; color: var(--burgundy); margin-bottom: 1.25rem;">1. Shipping & Contact</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">First Name</label>
+          <input type="text" required placeholder="Eleanor" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--cream); border-radius: 8px;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Last Name</label>
+          <input type="text" required placeholder="Vance" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--cream); border-radius: 8px;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Delivery Address</label>
+        <input type="text" required placeholder="148 Orchid Avenue, Suite 4B" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--cream); border-radius: 8px;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">City</label>
+          <input type="text" required placeholder="New York" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--cream); border-radius: 8px;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">State / Province</label>
+          <input type="text" required placeholder="NY" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--cream); border-radius: 8px;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem;">Postal Code</label>
+          <input type="text" required placeholder="10012" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--cream); border-radius: 8px;">
+        </div>
+      </div>
+
+      <h3 style="font-size: 1.35rem; color: var(--burgundy); margin-bottom: 1.25rem;">2. Payment Method</h3>
+      <div style="padding: 1.25rem; background: var(--cream-light); border-radius: 8px; border: 1px solid var(--cream); margin-bottom: 2rem;">
+        <label style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; cursor: pointer;">
+          <input type="radio" name="payment" checked>
+          <span>Credit / Debit Card or Cash On Delivery (COD)</span>
+        </label>
+        <p style="font-size: 0.8rem; color: #7A5858; margin-top: 0.4rem; margin-left: 1.75rem;">
+          Secure 256-bit encrypted checkout. Complimentary return insurance included.
+        </p>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.1rem 0; font-size: 1.05rem;">
+        Confirm & Place Order <i class="fa-solid fa-lock" style="margin-left: 8px;"></i>
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

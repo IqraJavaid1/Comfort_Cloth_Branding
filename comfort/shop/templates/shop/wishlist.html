@@ -1,0 +1,54 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}My Saved Outfits — Comfort Wishlist{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 6rem;">
+  
+  <div style="border-bottom: 1px solid var(--cream); padding-bottom: 1.5rem; margin-bottom: 2.5rem;">
+    <h1 style="font-size: 2.75rem; color: var(--burgundy); font-family: var(--font-serif);">My Wishlist</h1>
+    <p style="color: #7A5858; font-size: 0.95rem;">Curate your favorite silhouettes and dream outfits for later</p>
+  </div>
+
+  {% if products %}
+    <div class="products-grid">
+      {% for prod in products %}
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <a href="{% url 'shop:product_detail' prod.slug %}">
+              <img src="{% if prod.image %}{{ prod.image.url }}{% elif prod.image_url %}{{ prod.image_url }}{% else %}{% static 'shop/images/floral-maxi.jpg' %}{% endif %}" alt="{{ prod.name }}" class="product-img">
+            </a>
+            <a href="{% url 'shop:wishlist_toggle' prod.id %}" class="wishlist-toggle active" title="Remove from wishlist">
+              <i class="fa-solid fa-heart"></i>
+            </a>
+          </div>
+          <div class="product-info">
+            <span class="product-category">{{ prod.category.name }}</span>
+            <h3 class="product-title"><a href="{% url 'shop:product_detail' prod.slug %}">{{ prod.name }}</a></h3>
+            <div class="product-bottom">
+              <span class="product-price">${{ prod.price }}</span>
+              <form action="{% url 'shop:cart_add' prod.id %}" method="POST" style="margin: 0;">
+                {% csrf_token %}
+                <input type="hidden" name="size" value="M">
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
+                  Move to Bag
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="background: #fff; padding: 4rem 2rem; text-align: center; border-radius: var(--radius-md); border: 1px solid var(--cream);">
+      <i class="fa-regular fa-heart" style="font-size: 3rem; color: var(--coral); margin-bottom: 1rem;"></i>
+      <h2 style="font-size: 1.75rem; color: var(--burgundy); margin-bottom: 0.5rem;">Your Wishlist is Empty</h2>
+      <p style="color: #7A5858; margin-bottom: 2rem;">Tap the heart icon on any outfit to save it to your personal lookbook.</p>
+      <a href="{% url 'shop:shop' %}" class="btn btn-primary">Discover New Arrivals</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

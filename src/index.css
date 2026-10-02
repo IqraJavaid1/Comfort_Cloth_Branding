@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary: #EA7B7B;
+    --coral: #D25353;
+    --burgundy: #9E3B3B;
+    --cream: #FFEAD3;
+    --cream-light: #FFF8F2;
+    --dark-text: #2B1717;
+    --white: #FFFFFF;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--dark-text);
+    background-color: #FAF6F0;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  }
+
+  .font-script {
+    font-family: 'Alex Brush', cursive;
+  }
+}
+
+/* Luxury button hoverboard effect */
+.btn-comfort {
+  position: relative;
+  background-color: #9E3B3B;
+  color: #FFF8F2;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-comfort:hover {
+  background-color: #D25353;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(158, 59, 59, 0.25);
+}
+
+.btn-comfort::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(25deg);
+  transition: all 0.75s ease-in-out;
+  pointer-events: none;
+}
+
+.btn-comfort:hover::after {
+  left: 125%;
+}
+
+/* Secondary outline button */
+.btn-outline-comfort {
+  border: 1px solid #9E3B3B;
+  color: #9E3B3B;
+  background-color: transparent;
+  transition: all 0.25s ease;
+}
+
+.btn-outline-comfort:hover {
+  background-color: #9E3B3B;
+  color: #FFF8F2;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(158, 59, 59, 0.15);
+}
+
+/* Category circle card */
+.category-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.category-card:hover .category-circle {
+  transform: scale(1.08);
+  background-color: #EA7B7B;
+  color: #FFFFFF;
+}
+.category-card:hover .category-label {
+  color: #9E3B3B;
+}
+
+/* Product Card Hover */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(43, 23, 23, 0.08);
+}
+.product-card:hover .product-img {
+  transform: scale(1.04);
+}
+
+/* Smooth transitions */
+.smooth-img {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
