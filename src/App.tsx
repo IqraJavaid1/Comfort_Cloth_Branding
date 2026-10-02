@@ -420,6 +420,7 @@ export default function App() {
   // Admin Modals & Selection State
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [selectedOrderForDetail, setSelectedOrderForDetail] = useState<AdminOrder | null>(null);
   const [selectedInquiryForReply, setSelectedInquiryForReply] = useState<CustomerInquiry | null>(null);
   const [inquiryReplyText, setInquiryReplyText] = useState('');
@@ -624,10 +625,24 @@ export default function App() {
   const handleDeleteProduct = (productId: number) => {
     const prod = products.find(p => p.id === productId);
     if (!prod) return;
-    if (confirm(`Are you sure you want to delete "${prod.name}" from the store catalog?`)) {
-      setProducts(prev => prev.filter(p => p.id !== productId));
-      showToast(`Deleted ${prod.name} from catalog.`);
+    setProductToDelete(prod);
+  };
+
+  const confirmDeleteProduct = (productId: number) => {
+    const prod = products.find(p => p.id === productId);
+    if (!prod) {
+      setProductToDelete(null);
+      return;
     }
+    setProducts(prev => prev.filter(p => p.id !== productId));
+    setCart(prev => prev.filter(item => item.product.id !== productId));
+    setWishlist(prev => prev.filter(id => id !== productId));
+    if (editingProductId === productId) {
+      setShowAddProductModal(false);
+      setEditingProductId(null);
+    }
+    setProductToDelete(null);
+    showToast(`Removed "${prod.name}" from catalog.`);
   };
 
   const handleToggleProductNew = (productId: number) => {
@@ -2810,10 +2825,10 @@ export default function App() {
                                         </button>
                                         <button 
                                           onClick={() => handleDeleteProduct(prod.id)}
-                                          className="p-1.5 rounded-lg hover:bg-rose-50 text-rose-500 transition"
-                                          title="Delete Outfit"
+                                          className="p-1.5 rounded-lg hover:bg-rose-100 text-rose-600 transition cursor-pointer"
+                                          title={`Delete ${prod.name} from catalog`}
                                         >
-                                          <Trash className="w-4 h-4" />
+                                          <Trash2 className="w-4 h-4" />
                                         </button>
                                       </div>
                                     </td>
@@ -3738,13 +3753,29 @@ export default function App() {
                 />
               </div>
 
-              <div className="pt-2 flex gap-3">
+              <div className="pt-2 flex flex-wrap gap-2.5 items-center">
                 <button 
                   type="submit"
                   className="btn-comfort flex-grow py-3 rounded-full text-xs font-semibold cursor-pointer"
                 >
                   {editingProductId ? 'Save Product Updates' : 'Add to Catalog'}
                 </button>
+                {editingProductId && (
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      const prod = products.find(p => p.id === editingProductId);
+                      if (prod) {
+                        setProductToDelete(prod);
+                      }
+                    }}
+                    className="px-4 py-3 rounded-full border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                    title="Delete Outfit from Catalog"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Outfit</span>
+                  </button>
+                )}
                 <button 
                   type="button" 
                   onClick={() => setShowAddProductModal(false)}
@@ -3754,6 +3785,66 @@ export default function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE OUTFIT CONFIRMATION MODAL */}
+      {productToDelete && (
+        <div className="fixed inset-0 z-70 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 border border-[#FFEAD3] shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-start gap-3.5 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold text-[#2B1717]">
+                  Delete Outfit from Catalog?
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  This action cannot be undone. The outfit will be permanently removed from the live boutique storefront.
+                </p>
+              </div>
+            </div>
+
+            {/* Outfit Card Summary */}
+            <div className="bg-[#FFF8F2] border border-[#FFEAD3] rounded-2xl p-3.5 flex items-center gap-3 mb-5">
+              <img 
+                src={productToDelete.image} 
+                alt={productToDelete.name} 
+                className="w-14 h-16 object-cover rounded-xl border border-[#FFEAD3] shrink-0"
+                referrerPolicy="no-referrer"
+              />
+              <div className="min-w-0 flex-1">
+                <span className="font-bold text-xs text-[#2B1717] block truncate">
+                  {productToDelete.name}
+                </span>
+                <span className="text-[11px] text-[#9E3B3B] font-semibold block">
+                  ${productToDelete.price.toFixed(2)} • {productToDelete.category}
+                </span>
+                <span className="text-[10px] text-gray-400 block mt-0.5">
+                  ID: #{productToDelete.id} • {productToDelete.stock} units in stock
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-1">
+              <button
+                type="button"
+                onClick={() => setProductToDelete(null)}
+                className="px-4 py-2.5 rounded-full border border-gray-300 text-xs font-semibold text-gray-600 hover:bg-gray-100 transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => confirmDeleteProduct(productToDelete.id)}
+                className="px-5 py-2.5 rounded-full bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Confirm & Delete</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
