@@ -65,7 +65,9 @@ import {
   Calendar,
   ChevronRight,
   Image as ImageIcon,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Crown,
+  FolderPlus
 } from 'lucide-react';
 
 // Static assets bundled for guaranteed production and hosting availability
@@ -210,12 +212,45 @@ const INITIAL_PRODUCTS: Product[] = [
   }
 ];
 
-const CATEGORIES = [
-  { name: 'Dresses', slug: 'dresses', icon: Sparkles },
-  { name: 'Tops & Shirts', slug: 'tops-shirts', icon: Shirt },
-  { name: 'Bottoms', slug: 'bottoms', icon: Scissors },
-  { name: 'Co-ords', slug: 'co-ords', icon: Layers },
-  { name: 'Outerwear', slug: 'outerwear', icon: Wind },
+export interface CategoryItem {
+  name: string;
+  slug: string;
+  iconName?: string;
+  icon?: any;
+  description?: string;
+  isCustom?: boolean;
+}
+
+const CATEGORY_ICON_MAP: Record<string, any> = {
+  Sparkles,
+  Crown,
+  Shirt,
+  Scissors,
+  Layers,
+  Wind,
+  Feather,
+  Heart,
+  Star,
+  Tag,
+  FolderPlus,
+};
+
+const getCategoryIcon = (iconName?: string, slug?: string) => {
+  if (iconName && CATEGORY_ICON_MAP[iconName]) return CATEGORY_ICON_MAP[iconName];
+  if (slug === 'dresses') return Sparkles;
+  if (slug === 'tops-shirts') return Shirt;
+  if (slug === 'bottoms') return Scissors;
+  if (slug === 'co-ords') return Layers;
+  if (slug === 'outerwear') return Wind;
+  return Sparkles;
+};
+
+const INITIAL_CATEGORIES: CategoryItem[] = [
+  { name: 'Dresses', slug: 'dresses', iconName: 'Sparkles', icon: Sparkles, description: 'Evening gowns, maxi silhouettes, and everyday dresses' },
+  { name: 'Tops & Shirts', slug: 'tops-shirts', iconName: 'Shirt', icon: Shirt, description: 'Tailored blouses, silk shirts, and knit tops' },
+  { name: 'Bottoms', slug: 'bottoms', iconName: 'Scissors', icon: Scissors, description: 'High-waisted trousers, tailored slacks, and skirts' },
+  { name: 'Co-ords', slug: 'co-ords', iconName: 'Layers', icon: Layers, description: 'Harmonious monochrome sets and paired ensembles' },
+  { name: 'Outerwear', slug: 'outerwear', iconName: 'Wind', icon: Wind, description: 'Brushed wool duster coats and structured trenches' },
 ];
 
 interface AdminOrder {
@@ -404,6 +439,41 @@ export default function App() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>(INITIAL_SUBSCRIBERS);
   const [storeSettings, setStoreSettings] = useState<StoreSettings>(INITIAL_STORE_SETTINGS);
 
+  // Dynamic Categories State
+  const [categories, setCategories] = useState<CategoryItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('comfort_categories');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((c: any) => ({
+            ...c,
+            icon: getCategoryIcon(c.iconName, c.slug)
+          }));
+        }
+      }
+    } catch (e) {
+      console.error('Error loading saved categories', e);
+    }
+    return INITIAL_CATEGORIES;
+  });
+
+  const saveCategories = (newCategories: CategoryItem[]) => {
+    setCategories(newCategories);
+    try {
+      const serializable = newCategories.map(c => ({
+        name: c.name,
+        slug: c.slug,
+        iconName: c.iconName || 'Sparkles',
+        description: c.description || '',
+        isCustom: c.isCustom || false
+      }));
+      localStorage.setItem('comfort_categories', JSON.stringify(serializable));
+    } catch (e) {
+      console.error('Failed to save categories', e);
+    }
+  };
+
   // Interactive Admin Portal & Login State
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -411,7 +481,7 @@ export default function App() {
   const [adminPassword, setAdminPassword] = useState('');
   const [adminLoginError, setAdminLoginError] = useState<string | null>(null);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
-  const [adminActiveTab, setAdminActiveTab] = useState<'overview' | 'products' | 'orders' | 'inquiries' | 'discounts' | 'subscribers' | 'settings'>('overview');
+  const [adminActiveTab, setAdminActiveTab] = useState<'overview' | 'products' | 'categories' | 'orders' | 'inquiries' | 'discounts' | 'subscribers' | 'settings'>('overview');
   const [adminSearchQuery, setAdminSearchQuery] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'Processing' | 'Shipped' | 'Delivered'>('all');
   const [productStockFilter, setProductStockFilter] = useState<'all' | 'in-stock' | 'low-stock' | 'out-of-stock'>('all');
@@ -421,6 +491,14 @@ export default function App() {
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<CategoryItem | null>(null);
+  const [newCategoryForm, setNewCategoryForm] = useState({
+    name: '',
+    slug: '',
+    iconName: 'Sparkles',
+    description: '',
+  });
   const [selectedOrderForDetail, setSelectedOrderForDetail] = useState<AdminOrder | null>(null);
   const [selectedInquiryForReply, setSelectedInquiryForReply] = useState<CustomerInquiry | null>(null);
   const [inquiryReplyText, setInquiryReplyText] = useState('');
@@ -643,6 +721,71 @@ export default function App() {
     }
     setProductToDelete(null);
     showToast(`Removed "${prod.name}" from catalog.`);
+  };
+
+  const handleAddCategory = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedName = newCategoryForm.name.trim();
+    if (!trimmedName) {
+      showToast('Please enter a category name');
+      return;
+    }
+    const slug = newCategoryForm.slug.trim() 
+      ? newCategoryForm.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') 
+      : trimmedName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    
+    if (categories.some(c => c.slug === slug || c.name.toLowerCase() === trimmedName.toLowerCase())) {
+      showToast(`Category "${trimmedName}" already exists!`);
+      return;
+    }
+    
+    const createdCategory: CategoryItem = {
+      name: trimmedName,
+      slug,
+      iconName: newCategoryForm.iconName,
+      icon: CATEGORY_ICON_MAP[newCategoryForm.iconName] || Sparkles,
+      description: newCategoryForm.description.trim() || `Boutique collection of ${trimmedName.toLowerCase()} designed for modern elegance.`,
+      isCustom: true
+    };
+    
+    const updated = [...categories, createdCategory];
+    saveCategories(updated);
+    
+    // If Add Outfit modal is open, auto select this category!
+    if (showAddProductModal) {
+      setNewProductForm(prev => ({
+        ...prev,
+        category: createdCategory.name,
+        categorySlug: createdCategory.slug
+      }));
+    }
+    
+    setShowAddCategoryModal(false);
+    setNewCategoryForm({
+      name: '',
+      slug: '',
+      iconName: 'Sparkles',
+      description: ''
+    });
+    showToast(`Dress category "${trimmedName}" added successfully!`);
+  };
+
+  const confirmDeleteCategory = (cat: CategoryItem) => {
+    const linkedProducts = products.filter(p => p.categorySlug === cat.slug);
+    if (linkedProducts.length > 0) {
+      // Reassign affected products to default 'Dresses'
+      setProducts(prev => prev.map(p => p.categorySlug === cat.slug ? { ...p, category: 'Dresses', categorySlug: 'dresses' } : p));
+    }
+    const updated = categories.filter(c => c.slug !== cat.slug);
+    saveCategories(updated);
+    if (productCategoryFilter === cat.slug) {
+      setProductCategoryFilter('all');
+    }
+    if (selectedCategory === cat.slug) {
+      setSelectedCategory('all');
+    }
+    setCategoryToDelete(null);
+    showToast(`Category "${cat.name}" removed from boutique catalog.`);
   };
 
   const handleToggleProductNew = (productId: number) => {
@@ -1067,9 +1210,9 @@ export default function App() {
                   Harmonious ensembles and wardrobe staples tailored for modern ease.
                 </p>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-5 sm:gap-6">
-                  {CATEGORIES.map((cat) => {
-                    const IconComp = cat.icon;
+                <div className="flex flex-wrap justify-center gap-5 sm:gap-6">
+                  {categories.map((cat) => {
+                    const IconComp = cat.icon || Sparkles;
                     return (
                       <button
                         key={cat.slug}
@@ -1077,7 +1220,7 @@ export default function App() {
                           setSelectedCategory(cat.slug);
                           setCurrentView('shop');
                         }}
-                        className="category-card flex flex-col items-center gap-3 p-2 group cursor-pointer focus:outline-none"
+                        className="category-card flex flex-col items-center gap-3 p-2 group cursor-pointer focus:outline-none min-w-[90px] sm:min-w-[110px]"
                       >
                         <div className="category-circle w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#FFEAD3] flex items-center justify-center text-[#D25353] shadow-sm border-2 border-[#EA7B7B]/20">
                           <IconComp className="w-8 h-8 transition-colors group-hover:text-white" />
@@ -1344,15 +1487,15 @@ export default function App() {
                       onClick={() => setSelectedCategory('all')}
                       className={`block w-full text-left py-1.5 px-2 rounded-md transition ${selectedCategory === 'all' ? 'bg-[#FFEAD3] text-[#9E3B3B] font-bold' : 'text-[#5C3D3D] hover:text-[#9E3B3B]'}`}
                     >
-                      All Collections ({INITIAL_PRODUCTS.length})
+                      All Collections ({products.length})
                     </button>
-                    {CATEGORIES.map(cat => (
+                    {categories.map(cat => (
                       <button 
                         key={cat.slug}
                         onClick={() => setSelectedCategory(cat.slug)}
                         className={`block w-full text-left py-1.5 px-2 rounded-md transition ${selectedCategory === cat.slug ? 'bg-[#FFEAD3] text-[#9E3B3B] font-bold' : 'text-[#5C3D3D] hover:text-[#9E3B3B]'}`}
                       >
-                        {cat.name}
+                        {cat.name} ({products.filter(p => p.categorySlug === cat.slug).length})
                       </button>
                     ))}
                   </div>
@@ -2267,6 +2410,25 @@ export default function App() {
                     </button>
 
                     <button 
+                      onClick={() => setAdminActiveTab('categories')}
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${
+                        adminActiveTab === 'categories'
+                          ? 'bg-[#9E3B3B] text-white shadow-xs'
+                          : 'text-[#2B1717] hover:bg-[#FFEAD3]/60 hover:text-[#9E3B3B]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Layers className="w-4 h-4" />
+                        <span>Dress Categories</span>
+                      </div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                        adminActiveTab === 'categories' ? 'bg-white/20 text-white' : 'bg-[#FFEAD3] text-[#9E3B3B]'
+                      }`}>
+                        {categories.length}
+                      </span>
+                    </button>
+
+                    <button 
                       onClick={() => setAdminActiveTab('orders')}
                       className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${
                         adminActiveTab === 'orders'
@@ -2398,6 +2560,7 @@ export default function App() {
                   {[
                     { id: 'overview', label: 'Dashboard', icon: BarChart3 },
                     { id: 'products', label: 'Outfits', icon: Package },
+                    { id: 'categories', label: 'Categories', icon: Layers },
                     { id: 'orders', label: 'Orders', icon: ListOrdered },
                     { id: 'inquiries', label: 'Inquiries', icon: MessageSquare },
                     { id: 'discounts', label: 'Coupons', icon: Tag },
@@ -2650,28 +2813,45 @@ export default function App() {
                           <h3 className="font-serif text-2xl font-bold text-[#9E3B3B]">Outfits & Catalogue Management</h3>
                           <p className="text-xs text-[#7A5858]">Manage pricing, stock counts, descriptions, and arrival tags for live outfits.</p>
                         </div>
-                        <button 
-                          onClick={() => {
-                            setEditingProductId(null);
-                            setImagePreviewError(false);
-                            setNewProductForm({
-                              name: '',
-                              category: 'Dresses',
-                              categorySlug: 'dresses',
-                              price: 49.99,
-                              originalPrice: 69.99,
-                              stock: 30,
-                              description: '',
-                              image: '',
-                              isNew: true,
-                            });
-                            setShowAddProductModal(true);
-                          }}
-                          className="btn-comfort px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-xs cursor-pointer"
-                        >
-                          <PlusCircle className="w-4 h-4" />
-                          <span>Add New Outfit</span>
-                        </button>
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <button 
+                            onClick={() => {
+                              setNewCategoryForm({
+                                name: '',
+                                slug: '',
+                                iconName: 'Sparkles',
+                                description: '',
+                              });
+                              setShowAddCategoryModal(true);
+                            }}
+                            className="px-4 py-2.5 rounded-full text-xs font-bold border border-[#9E3B3B] text-[#9E3B3B] hover:bg-[#FFEAD3]/60 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>+ New Category</span>
+                          </button>
+                          <button 
+                            onClick={() => {
+                              setEditingProductId(null);
+                              setImagePreviewError(false);
+                              setNewProductForm({
+                                name: '',
+                                category: categories[0]?.name || 'Dresses',
+                                categorySlug: categories[0]?.slug || 'dresses',
+                                price: 49.99,
+                                originalPrice: 69.99,
+                                stock: 30,
+                                description: '',
+                                image: '',
+                                isNew: true,
+                              });
+                              setShowAddProductModal(true);
+                            }}
+                            className="btn-comfort px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-xs cursor-pointer"
+                          >
+                            <PlusCircle className="w-4 h-4" />
+                            <span>Add New Outfit</span>
+                          </button>
+                        </div>
                       </div>
 
                       {/* Filters: Category + Stock */}
@@ -2686,7 +2866,7 @@ export default function App() {
                           >
                             All ({products.length})
                           </button>
-                          {CATEGORIES.map(c => (
+                          {categories.map(c => (
                             <button 
                               key={c.slug}
                               onClick={() => setProductCategoryFilter(c.slug)}
@@ -2836,6 +3016,200 @@ export default function App() {
                                 ))}
                             </tbody>
                           </table>
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+
+                  {/* TAB: DRESS CATEGORIES & COLLECTIONS */}
+                  {adminActiveTab === 'categories' && (
+                    <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in">
+                      
+                      {/* Top Header */}
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-serif text-2xl font-bold text-[#9E3B3B]">Dress Categories & Collections</h3>
+                            <span className="text-[11px] bg-[#FFEAD3] text-[#9E3B3B] font-bold px-2.5 py-0.5 rounded-full border border-[#EA7B7B]/30">
+                              {categories.length} Active
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#7A5858] mt-0.5">
+                            Manage silhouette styles, dress collections, and seasonal classifications across the boutique storefront.
+                          </p>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            setNewCategoryForm({
+                              name: '',
+                              slug: '',
+                              iconName: 'Sparkles',
+                              description: '',
+                            });
+                            setShowAddCategoryModal(true);
+                          }}
+                          className="btn-comfort px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-xs cursor-pointer"
+                        >
+                          <PlusCircle className="w-4 h-4" />
+                          <span>+ Add New Category</span>
+                        </button>
+                      </div>
+
+                      {/* Stat Overview Cards */}
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="bg-white p-5 rounded-3xl border border-[#FFEAD3] shadow-xs">
+                          <span className="text-xs text-[#7A5858] font-semibold">Total Categories</span>
+                          <div className="text-2xl font-bold text-[#9E3B3B] mt-1">{categories.length}</div>
+                          <p className="text-[10px] text-[#A67E7E] mt-1">Available in shop filters</p>
+                        </div>
+                        <div className="bg-white p-5 rounded-3xl border border-[#FFEAD3] shadow-xs">
+                          <span className="text-xs text-[#7A5858] font-semibold">Custom Categories</span>
+                          <div className="text-2xl font-bold text-[#D25353] mt-1">
+                            {categories.filter(c => c.isCustom).length}
+                          </div>
+                          <p className="text-[10px] text-[#A67E7E] mt-1">Created via Admin Portal</p>
+                        </div>
+                        <div className="bg-white p-5 rounded-3xl border border-[#FFEAD3] shadow-xs">
+                          <span className="text-xs text-[#7A5858] font-semibold">Catalog Outfits</span>
+                          <div className="text-2xl font-bold text-[#2B1717] mt-1">{products.length}</div>
+                          <p className="text-[10px] text-[#A67E7E] mt-1">Distributed across collections</p>
+                        </div>
+                        <div className="bg-white p-5 rounded-3xl border border-[#FFEAD3] shadow-xs">
+                          <span className="text-xs text-[#7A5858] font-semibold">Dresses Collection</span>
+                          <div className="text-2xl font-bold text-[#9E3B3B] mt-1">
+                            {products.filter(p => p.categorySlug === 'dresses').length}
+                          </div>
+                          <p className="text-[10px] text-[#A67E7E] mt-1">Core signature silhouettes</p>
+                        </div>
+                      </div>
+
+                      {/* Quick Inspiration Chips */}
+                      <div className="bg-gradient-to-r from-[#FFF8F2] to-[#FFEAD3]/40 p-5 rounded-3xl border border-[#FFEAD3] space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-[#D25353]" />
+                            <span className="font-serif text-sm font-bold text-[#9E3B3B]">
+                              Quick Add Popular Dress Silhouette Categories
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-[#7A5858] hidden sm:inline">Click any preset to pre-fill</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { name: 'Maxi Dresses', icon: 'Sparkles', desc: 'Floor-length flowing silhouettes, tiered ruffles, and garden prints' },
+                            { name: 'Evening Gowns', icon: 'Crown', desc: 'Opulent gala attire, black-tie silhouettes, and silk column gowns' },
+                            { name: 'Floral Sundresses', icon: 'Feather', desc: 'Airy linen and cotton dresses with botanical garden prints' },
+                            { name: 'Silk Slip Dresses', icon: 'Heart', desc: 'Minimalist 90s bias-cut satin and mulberry silk slip dresses' },
+                            { name: 'Party & Cocktail', icon: 'Star', desc: 'Sophisticated midi dresses and metallic partywear' },
+                            { name: 'Casual Knit Dresses', icon: 'Shirt', desc: 'Effortless ribbed knits and cozy daytime shift dresses' },
+                            { name: 'Resort & Vacation', icon: 'Wind', desc: 'Breezy destination kaftans, wrap dresses, and poolside tunics' },
+                            { name: 'Bridal & Formal', icon: 'Crown', desc: 'Ivory rehearsal dinners, registry ceremonies, and wedding guests' },
+                          ].map(preset => {
+                            const isExisting = categories.some(c => c.name.toLowerCase() === preset.name.toLowerCase());
+                            return (
+                              <button
+                                key={preset.name}
+                                disabled={isExisting}
+                                onClick={() => {
+                                  setNewCategoryForm({
+                                    name: preset.name,
+                                    slug: preset.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+                                    iconName: preset.icon,
+                                    description: preset.desc,
+                                  });
+                                  setShowAddCategoryModal(true);
+                                }}
+                                className={`text-xs font-semibold px-3 py-1.5 rounded-full transition flex items-center gap-1.5 ${
+                                  isExisting
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 opacity-70 cursor-default'
+                                    : 'bg-white hover:bg-[#FFEAD3] text-[#9E3B3B] border border-[#FFEAD3] cursor-pointer shadow-xs hover:border-[#9E3B3B]'
+                                }`}
+                              >
+                                {isExisting ? <Check className="w-3 h-3 text-emerald-600" /> : <Plus className="w-3 h-3 text-[#D25353]" />}
+                                <span>{preset.name}</span>
+                                {isExisting && <span className="text-[10px] text-emerald-600 font-normal">(Active)</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Categories Table / Card Grid */}
+                      <div className="bg-white rounded-3xl border border-[#FFEAD3] shadow-xs overflow-hidden">
+                        <div className="p-5 border-b border-[#FFEAD3] flex justify-between items-center bg-[#FFF8F2]/60">
+                          <div>
+                            <h4 className="font-serif text-lg font-bold text-[#9E3B3B]">Configured Boutique Collections</h4>
+                            <p className="text-xs text-[#7A5858]">These categories appear in navigation menus, product badges, and customer search filters.</p>
+                          </div>
+                          <span className="text-xs font-semibold text-[#7A5858]">
+                            {categories.length} Total Categories
+                          </span>
+                        </div>
+
+                        <div className="divide-y divide-[#FFEAD3]">
+                          {categories.map((cat) => {
+                            const IconComponent = cat.icon || Sparkles;
+                            const count = products.filter(p => p.categorySlug === cat.slug).length;
+                            return (
+                              <div key={cat.slug} className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-[#FFF8F2]/40 transition">
+                                <div className="flex items-start sm:items-center gap-3.5">
+                                  <div className="w-12 h-12 rounded-2xl bg-[#FFEAD3] flex items-center justify-center text-[#9E3B3B] border border-[#EA7B7B]/30 flex-shrink-0 shadow-xs">
+                                    <IconComponent className="w-6 h-6" />
+                                  </div>
+                                  <div>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <h5 className="font-serif font-bold text-sm sm:text-base text-[#2B1717]">
+                                        {cat.name}
+                                      </h5>
+                                      <code className="text-[10px] bg-[#FFEAD3]/60 text-[#7A5858] px-2 py-0.5 rounded-md font-mono">
+                                        slug: {cat.slug}
+                                      </code>
+                                      {cat.isCustom ? (
+                                        <span className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 font-bold px-2 py-0.5 rounded-full">
+                                          Custom Created
+                                        </span>
+                                      ) : (
+                                        <span className="text-[10px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-full">
+                                          Core Collection
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-[#7A5858] mt-1 max-w-xl">
+                                      {cat.description || 'Curated silhouette category for Comfort women’s apparel.'}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-[#FFEAD3]">
+                                  <span className="text-xs bg-[#FFEAD3] text-[#9E3B3B] font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                                    {count} {count === 1 ? 'Outfit' : 'Outfits'}
+                                  </span>
+
+                                  <button
+                                    onClick={() => {
+                                      setProductCategoryFilter(cat.slug);
+                                      setAdminActiveTab('products');
+                                    }}
+                                    className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-[#FFEAD3] text-[#5C3D3D] hover:bg-[#FFEAD3] hover:text-[#9E3B3B] transition flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                    <span>View Outfits</span>
+                                  </button>
+
+                                  {cat.isCustom && (
+                                    <button
+                                      onClick={() => setCategoryToDelete(cat)}
+                                      className="p-1.5 rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition cursor-pointer"
+                                      title="Delete Category"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -3687,11 +4061,29 @@ export default function App() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#2B1717] mb-1">Category</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-[#2B1717]">Category</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewCategoryForm({
+                          name: '',
+                          slug: '',
+                          iconName: 'Sparkles',
+                          description: '',
+                        });
+                        setShowAddCategoryModal(true);
+                      }}
+                      className="text-[11px] font-bold text-[#D25353] hover:underline flex items-center gap-0.5 cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>+ New Category</span>
+                    </button>
+                  </div>
                   <select 
                     value={newProductForm.category}
                     onChange={(e) => {
-                      const sel = CATEGORIES.find(c => c.name === e.target.value);
+                      const sel = categories.find(c => c.name === e.target.value);
                       setNewProductForm({ 
                         ...newProductForm, 
                         category: e.target.value,
@@ -3700,7 +4092,7 @@ export default function App() {
                     }}
                     className="w-full px-3 py-2 rounded-xl border border-[#FFEAD3] text-xs focus:ring-2 focus:ring-[#9E3B3B] outline-none bg-white"
                   >
-                    {CATEGORIES.map(c => (
+                    {categories.map(c => (
                       <option key={c.slug} value={c.name}>{c.name}</option>
                     ))}
                   </select>
@@ -3840,6 +4232,240 @@ export default function App() {
                 type="button"
                 onClick={() => confirmDeleteProduct(productToDelete.id)}
                 className="px-5 py-2.5 rounded-full bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Confirm & Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD NEW DRESS CATEGORY MODAL */}
+      {showAddCategoryModal && (
+        <div className="fixed inset-0 z-70 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-[#FFEAD3] shadow-2xl animate-in zoom-in-95 max-h-[92vh] overflow-y-auto">
+            <div className="flex justify-between items-center pb-3 border-b border-[#FFEAD3] mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-[#FFEAD3] text-[#9E3B3B] flex items-center justify-center">
+                  <FolderPlus className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg font-bold text-[#9E3B3B]">Add New Dress Category</h3>
+                  <p className="text-[11px] text-[#7A5858]">Create a boutique silhouette collection for your catalog</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowAddCategoryModal(false)} 
+                className="p-1.5 rounded-full hover:bg-[#FFEAD3] text-[#7A5858] transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddCategory} className="space-y-4 text-xs">
+              
+              {/* Quick Inspiration Tags */}
+              <div className="bg-[#FFF8F2] p-3 rounded-2xl border border-[#FFEAD3]">
+                <span className="block text-[11px] font-bold text-[#9E3B3B] mb-1.5">
+                  Popular Silhouette Ideas (click to use):
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    'Maxi Dresses',
+                    'Evening Gowns',
+                    'Floral Sundresses',
+                    'Silk Slip Dresses',
+                    'Cocktail & Party',
+                    'Casual Knit Dresses',
+                    'Bridal & Formal',
+                  ].map(idea => (
+                    <button
+                      key={idea}
+                      type="button"
+                      onClick={() => {
+                        const slug = idea.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                        setNewCategoryForm(prev => ({
+                          ...prev,
+                          name: idea,
+                          slug: slug,
+                          description: prev.description || `Curated boutique ${idea.toLowerCase()} designed for modern elegance.`
+                        }));
+                      }}
+                      className="text-[10px] font-semibold bg-white hover:bg-[#FFEAD3] text-[#7A5858] hover:text-[#9E3B3B] px-2.5 py-1 rounded-full border border-[#FFEAD3] transition cursor-pointer"
+                    >
+                      + {idea}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-[#2B1717] mb-1">
+                  Category Name <span className="text-[#D25353]">*</span>
+                </label>
+                <input 
+                  type="text"
+                  required
+                  placeholder="e.g. Maxi Dresses, Evening Gowns, Summer Florals"
+                  value={newCategoryForm.name}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const autoSlug = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                    setNewCategoryForm({
+                      ...newCategoryForm,
+                      name: val,
+                      slug: autoSlug
+                    });
+                  }}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#FFEAD3] focus:ring-2 focus:ring-[#9E3B3B] outline-none text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-[#2B1717] mb-1">
+                  Category URL Slug
+                </label>
+                <input 
+                  type="text"
+                  placeholder="e.g. maxi-dresses"
+                  value={newCategoryForm.slug}
+                  onChange={(e) => setNewCategoryForm({ ...newCategoryForm, slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#FFEAD3] focus:ring-2 focus:ring-[#9E3B3B] outline-none text-xs font-mono bg-[#FFF8F2]/50"
+                />
+                <p className="text-[10px] text-[#7A5858] mt-1">Used internally for store filtering and collection routing.</p>
+              </div>
+
+              {/* Icon Selector */}
+              <div>
+                <label className="block font-semibold text-[#2B1717] mb-1.5">
+                  Select Category Icon
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                  {[
+                    { id: 'Sparkles', label: 'Sparkles', icon: Sparkles },
+                    { id: 'Crown', label: 'Crown', icon: Crown },
+                    { id: 'Shirt', label: 'Blouse', icon: Shirt },
+                    { id: 'Scissors', label: 'Tailored', icon: Scissors },
+                    { id: 'Layers', label: 'Layers', icon: Layers },
+                    { id: 'Wind', label: 'Breezy', icon: Wind },
+                    { id: 'Feather', label: 'Feather', icon: Feather },
+                    { id: 'Heart', label: 'Romantic', icon: Heart },
+                    { id: 'Star', label: 'Star', icon: Star },
+                    { id: 'Tag', label: 'Tag', icon: Tag },
+                  ].map(item => {
+                    const IconComp = item.icon;
+                    const isSelected = newCategoryForm.iconName === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setNewCategoryForm({ ...newCategoryForm, iconName: item.id })}
+                        className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 transition cursor-pointer ${
+                          isSelected 
+                            ? 'bg-[#FFEAD3] border-[#9E3B3B] text-[#9E3B3B] shadow-xs ring-1 ring-[#9E3B3B]' 
+                            : 'bg-white border-[#FFEAD3] text-[#7A5858] hover:bg-[#FFF8F2]'
+                        }`}
+                      >
+                        <IconComp className="w-4 h-4" />
+                        <span className="text-[9px] font-semibold">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-[#2B1717] mb-1">
+                  Description / Silhouette Notes
+                </label>
+                <textarea 
+                  rows={2}
+                  placeholder="e.g. Sweeping floor-length dresses, ethereal chiffon tiers, and summer prints."
+                  value={newCategoryForm.description}
+                  onChange={(e) => setNewCategoryForm({ ...newCategoryForm, description: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#FFEAD3] focus:ring-2 focus:ring-[#9E3B3B] outline-none text-xs resize-none"
+                />
+              </div>
+
+              {/* Live Preview Card */}
+              <div className="p-3 bg-[#FFF8F2] rounded-2xl border border-[#FFEAD3] flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#FFEAD3] flex items-center justify-center text-[#9E3B3B] border border-[#EA7B7B]/30 flex-shrink-0">
+                  {React.createElement(CATEGORY_ICON_MAP[newCategoryForm.iconName] || Sparkles, { className: 'w-5 h-5' })}
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-[#D25353] tracking-wider">Store Preview</span>
+                  <p className="font-serif font-bold text-xs text-[#2B1717]">
+                    {newCategoryForm.name || 'Category Name'}
+                  </p>
+                  <p className="text-[10px] text-[#7A5858] line-clamp-1">
+                    {newCategoryForm.description || 'Description will appear here'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddCategoryModal(false)}
+                  className="px-4 py-2 rounded-xl border border-[#FFEAD3] text-[#5C3D3D] hover:bg-[#FFEAD3] transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-comfort px-5 py-2 rounded-xl font-bold flex items-center gap-1.5 cursor-pointer"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Create Category</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CATEGORY CONFIRMATION MODAL */}
+      {categoryToDelete && (
+        <div className="fixed inset-0 z-80 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 border border-[#FFEAD3] shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-center gap-3 text-rose-600 mb-3">
+              <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="w-5 h-5 text-rose-500" />
+              </div>
+              <div>
+                <h3 className="font-serif text-base font-bold text-[#2B1717]">Delete Dress Category?</h3>
+                <p className="text-xs text-[#7A5858]">This will remove the category from store filters.</p>
+              </div>
+            </div>
+
+            <div className="my-4 p-3.5 bg-[#FFF8F2] rounded-2xl border border-[#FFEAD3] space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="font-serif font-bold text-sm text-[#9E3B3B]">{categoryToDelete.name}</span>
+                <code className="text-[10px] bg-[#FFEAD3] text-[#7A5858] px-2 py-0.5 rounded font-mono">
+                  slug: {categoryToDelete.slug}
+                </code>
+              </div>
+              {products.filter(p => p.categorySlug === categoryToDelete.slug).length > 0 && (
+                <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded-xl border border-amber-200 mt-2">
+                  Notice: {products.filter(p => p.categorySlug === categoryToDelete.slug).length} outfit(s) currently assigned to this category will be safely reassigned to the default <strong>Dresses</strong> category.
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setCategoryToDelete(null)}
+                className="px-4 py-2 rounded-xl border border-[#FFEAD3] text-[#5C3D3D] hover:bg-[#FFEAD3] text-xs font-semibold transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => confirmDeleteCategory(categoryToDelete)}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Confirm & Delete</span>
