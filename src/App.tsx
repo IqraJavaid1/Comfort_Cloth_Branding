@@ -68,14 +68,23 @@ import {
   ChevronRight
 } from 'lucide-react';
 
+// Static assets bundled for guaranteed production and hosting availability
+import logoImg from './assets/images/logo.png';
+import logoSvg from './assets/images/logo.svg';
+import heroImg from './assets/images/hero_fashion_model_1790831774400.jpg';
+import floralMaxiImg from './assets/images/product_floral_maxi_1790831785578.jpg';
+import coordSetImg from './assets/images/product_coord_set_1790831796381.jpg';
+import embroideredKurtaImg from './assets/images/product_embroidered_kurta_1790831806569.jpg';
+import aboutStoryImg from './assets/images/about_editorial_story_1790831819549.jpg';
+
 // Asset paths
-const LOGO_IMG = '/logo.png';
-const LOGO_SVG = '/src/assets/images/logo.svg';
-const HERO_IMG = '/src/assets/images/hero_fashion_model_1790831774400.jpg';
-const FLORAL_MAXI_IMG = '/src/assets/images/product_floral_maxi_1790831785578.jpg';
-const COORD_SET_IMG = '/src/assets/images/product_coord_set_1790831796381.jpg';
-const EMBROIDERED_KURTA_IMG = '/src/assets/images/product_embroidered_kurta_1790831806569.jpg';
-const ABOUT_STORY_IMG = '/src/assets/images/about_editorial_story_1790831819549.jpg';
+const LOGO_IMG = logoImg;
+const LOGO_SVG = logoSvg;
+const HERO_IMG = heroImg;
+const FLORAL_MAXI_IMG = floralMaxiImg;
+const COORD_SET_IMG = coordSetImg;
+const EMBROIDERED_KURTA_IMG = embroideredKurtaImg;
+const ABOUT_STORY_IMG = aboutStoryImg;
 
 // Types
 interface Product {
