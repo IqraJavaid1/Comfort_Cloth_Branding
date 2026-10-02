@@ -26,8 +26,6 @@ import {
   Scissors,
   Layers,
   Wind,
-  Gem,
-  Footprints,
   Feather,
   Clock,
   ShieldCheck,
@@ -216,8 +214,6 @@ const CATEGORIES = [
   { name: 'Bottoms', slug: 'bottoms', icon: Scissors },
   { name: 'Co-ords', slug: 'co-ords', icon: Layers },
   { name: 'Outerwear', slug: 'outerwear', icon: Wind },
-  { name: 'Accessories', slug: 'accessories', icon: Gem },
-  { name: 'Footwear', slug: 'footwear', icon: Footprints },
 ];
 
 interface AdminOrder {
